@@ -138,10 +138,10 @@ main(int argc, char **argv)
             break;
         }
         if (ret != -1) {
-            if (!strncmp(lineptr, "show\n", 5)) {
+            if (ret == 5 && !strncmp(lineptr, "show\n", 5)) {
                 draw(win, ren, &config);
                 timer_settime(timer, 0, &timer_int, NULL);
-            } else if (!strncmp(lineptr, "bg=", 3)) {
+            } else if (ret == 12 && !strncmp(lineptr, "bg=", 3)) {
                 hextorgba(lineptr + 3, &config.bg);
             }
         }
