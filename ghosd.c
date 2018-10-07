@@ -34,7 +34,7 @@ void
 hextorgba(char *hex, SDL_Color *rgba)
 {
     char hexpart[3];
-    hexpart[3] = '\0';
+    hexpart[2] = '\0';
 
     hexpart[0] = hex[0];
     hexpart[1] = hex[1];
