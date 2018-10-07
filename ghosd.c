@@ -11,10 +11,18 @@
 #include <time.h>
 #include <unistd.h>
 
+struct geometry {
+    int w;
+    int h;
+    int x;
+    int y;
+};
+
 struct config {
     timer_t timer;
     struct itimerspec timer_int;
     SDL_Color bg;
+    struct geometry geom;
 };
 
 sig_atomic_t run, timed_out;
@@ -56,8 +64,23 @@ hextorgba(char *hex, SDL_Color *rgba)
 }
 
 void
+geomtovec(char *lineptr, int *x, int *y)
+{
+    int res;
+    char *startlineptr, *endlineptr;
+    startlineptr = lineptr;
+    res          = strtol(startlineptr, &endlineptr, 10);
+    *x           = startlineptr == endlineptr ? *x : res;
+    startlineptr = endlineptr + 1;
+    res          = strtol(startlineptr, &endlineptr, 10);
+    *y           = startlineptr == endlineptr ? *y : res;
+}
+
+void
 draw(SDL_Window *win, SDL_Renderer *ren, struct config *cfg)
 {
+    SDL_SetWindowSize(win, cfg->geom.w, cfg->geom.h);
+    SDL_SetWindowPosition(win, cfg->geom.x, cfg->geom.y);
     SDL_ShowWindow(win);
     SDL_SetRenderDrawColor(ren, cfg->bg.r, cfg->bg.g, cfg->bg.b, cfg->bg.a);
     SDL_RenderClear(ren);
@@ -106,7 +129,10 @@ main(int argc, char **argv)
     }
 
     struct config config = {
-        .timer = 0, .timer_int = {{0}}, .bg = {0, 0, 0, 255}};
+        .timer     = 0,
+        .timer_int = {{0}},
+        .bg        = {0, 0, 0, 255},
+        .geom = {640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED}};
     timer_create(CLOCK_REALTIME, &timer_sigev, &config.timer);
     config.timer_int.it_value.tv_sec = 1;
 
@@ -149,6 +175,10 @@ main(int argc, char **argv)
                 hextorgba(lineptr + 3, &config.bg);
             } else if (ret >= 10 && !strncmp(lineptr, "timeout=", 8)) {
                 config.timer_int.it_value.tv_sec = atoi(lineptr + 8);
+            } else if (ret >= 14 && !strncmp(lineptr, "windowsize=", 11)) {
+                geomtovec(lineptr + 11, &config.geom.w, &config.geom.h);
+            } else if (ret >= 13 && !strncmp(lineptr, "windowpos=", 10)) {
+                geomtovec(lineptr + 10, &config.geom.x, &config.geom.y);
             }
         }
         fclose(fifo);
