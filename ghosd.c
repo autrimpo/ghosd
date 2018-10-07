@@ -59,7 +59,6 @@ void
 draw(SDL_Window *win, SDL_Renderer *ren, struct config *cfg)
 {
     SDL_ShowWindow(win);
-    SDL_ShowWindow(win);
     SDL_SetRenderDrawColor(ren, cfg->bg.r, cfg->bg.g, cfg->bg.b, cfg->bg.a);
     SDL_RenderClear(ren);
     SDL_RenderPresent(ren);
