@@ -153,6 +153,8 @@ main(int argc, char **argv)
         fclose(fifo);
     }
 
+    free(lineptr);
+
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
     SDL_Quit();
