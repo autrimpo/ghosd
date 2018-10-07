@@ -5,10 +5,15 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+
+struct config {
+    SDL_Color bg;
+};
 
 sig_atomic_t run, timed_out;
 
@@ -23,6 +28,39 @@ sighandler(int signo)
         timed_out = 1;
         break;
     }
+}
+
+void
+hextorgba(char *hex, SDL_Color *rgba)
+{
+    char hexpart[3];
+    hexpart[3] = '\0';
+
+    hexpart[0] = hex[0];
+    hexpart[1] = hex[1];
+    rgba->r    = strtol(hexpart, NULL, 16);
+
+    hexpart[0] = hex[2];
+    hexpart[1] = hex[3];
+    rgba->g    = strtol(hexpart, NULL, 16);
+
+    hexpart[0] = hex[4];
+    hexpart[1] = hex[5];
+    rgba->b    = strtol(hexpart, NULL, 16);
+
+    hexpart[0] = hex[6];
+    hexpart[1] = hex[7];
+    rgba->a    = strtol(hexpart, NULL, 16);
+}
+
+void
+draw(SDL_Window *win, SDL_Renderer *ren, struct config *cfg)
+{
+    SDL_ShowWindow(win);
+    SDL_ShowWindow(win);
+    SDL_SetRenderDrawColor(ren, cfg->bg.r, cfg->bg.g, cfg->bg.b, cfg->bg.a);
+    SDL_RenderClear(ren);
+    SDL_RenderPresent(ren);
 }
 
 int
@@ -52,7 +90,8 @@ main(int argc, char **argv)
     }
 
     SDL_Window *win = SDL_CreateWindow(
-        "ghosd", 100, 100, 640, 460, SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS);
+        "ghosd", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 460,
+        SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS);
     if (!win) {
         fprintf(stderr, "SDL failed to create a window: %s\n", SDL_GetError());
         SDL_Quit();
@@ -68,6 +107,8 @@ main(int argc, char **argv)
         SDL_Quit();
         return 1;
     }
+
+    struct config config = {.bg = {0, 0, 0, 255}};
 
     run = 1;
 
@@ -97,9 +138,11 @@ main(int argc, char **argv)
             break;
         }
         if (ret != -1) {
-            if (!strncmp(lineptr, "show\n", linelen)) {
-                SDL_ShowWindow(win);
+            if (!strncmp(lineptr, "show\n", 5)) {
+                draw(win, ren, &config);
                 timer_settime(timer, 0, &timer_int, NULL);
+            } else if (!strncmp(lineptr, "bg=", 3)) {
+                hextorgba(lineptr + 3, &config.bg);
             }
         }
         fclose(fifo);
