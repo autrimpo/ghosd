@@ -12,6 +12,8 @@
 #include <unistd.h>
 
 struct config {
+    timer_t timer;
+    struct itimerspec timer_int;
     SDL_Color bg;
 };
 
@@ -61,6 +63,7 @@ draw(SDL_Window *win, SDL_Renderer *ren, struct config *cfg)
     SDL_SetRenderDrawColor(ren, cfg->bg.r, cfg->bg.g, cfg->bg.b, cfg->bg.a);
     SDL_RenderClear(ren);
     SDL_RenderPresent(ren);
+    timer_settime(cfg->timer, 0, &cfg->timer_int, NULL);
 }
 
 int
@@ -74,11 +77,6 @@ main(int argc, char **argv)
     struct sigevent timer_sigev = {0};
     timer_sigev.sigev_notify    = SIGEV_SIGNAL;
     timer_sigev.sigev_signo     = SIGALRM;
-
-    timer_t timer;
-    timer_create(CLOCK_REALTIME, &timer_sigev, &timer);
-    struct itimerspec timer_int = {0};
-    timer_int.it_value.tv_sec   = 1;
 
     FILE *fifo = NULL;
     unlink(GHOSD_FIFO);
@@ -108,7 +106,10 @@ main(int argc, char **argv)
         return 1;
     }
 
-    struct config config = {.bg = {0, 0, 0, 255}};
+    struct config config = {
+        .timer = 0, .timer_int = {{0}}, .bg = {0, 0, 0, 255}};
+    timer_create(CLOCK_REALTIME, &timer_sigev, &config.timer);
+    config.timer_int.it_value.tv_sec = 1;
 
     run = 1;
 
@@ -140,9 +141,10 @@ main(int argc, char **argv)
         if (ret != -1) {
             if (ret == 5 && !strncmp(lineptr, "show\n", 5)) {
                 draw(win, ren, &config);
-                timer_settime(timer, 0, &timer_int, NULL);
             } else if (ret == 12 && !strncmp(lineptr, "bg=", 3)) {
                 hextorgba(lineptr + 3, &config.bg);
+            } else if (ret >= 10 && !strncmp(lineptr, "timeout=", 8)) {
+                config.timer_int.it_value.tv_sec = atoi(lineptr + 8);
             }
         }
         fclose(fifo);
