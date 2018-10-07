@@ -134,11 +134,16 @@ main(int argc, char **argv)
         if (!run) {
             break;
         }
-        ret = getline(&lineptr, &linelen, fifo);
-        if (!run) {
-            break;
-        }
-        if (ret != -1) {
+        ret = 0;
+        while (ret != -1) {
+            ret = getline(&lineptr, &linelen, fifo);
+            if (ret == -1 && errno == EINTR) {
+                ret = 0;
+                continue;
+            }
+            if (!run || ret == -1) {
+                break;
+            }
             if (ret == 5 && !strncmp(lineptr, "show\n", 5)) {
                 draw(win, ren, &config);
             } else if (ret == 12 && !strncmp(lineptr, "bg=", 3)) {
