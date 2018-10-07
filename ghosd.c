@@ -111,7 +111,7 @@ main(int argc, char **argv)
 
     SDL_Window *win = SDL_CreateWindow(
         "ghosd", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 460,
-        SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS);
+        SDL_WINDOW_HIDDEN | SDL_WINDOW_POPUP_MENU);
     if (!win) {
         fprintf(stderr, "SDL failed to create a window: %s\n", SDL_GetError());
         SDL_Quit();
