@@ -71,8 +71,14 @@ main(int argc, char **argv)
 
     run = 1;
 
-    int ret;
-    char buffer[100];
+    size_t ret;
+    size_t linelen = 100;
+    char *lineptr;
+
+    lineptr = malloc(linelen);
+    if (!lineptr) {
+        fprintf(stderr, "Failed to allocate a line buffer.\n");
+    }
 
     while (run) {
         fifo = fopen(GHOSD_FIFO, "r");
@@ -86,14 +92,15 @@ main(int argc, char **argv)
         if (!run) {
             break;
         }
-        ret = fread(buffer, 1, 100, fifo);
+        ret = getline(&lineptr, &linelen, fifo);
         if (!run) {
             break;
         }
-        if (ret == EINTR) {
-        } else if (ret) {
-            SDL_ShowWindow(win);
-            timer_settime(timer, 0, &timer_int, NULL);
+        if (ret != -1) {
+            if (!strncmp(lineptr, "show\n", linelen)) {
+                SDL_ShowWindow(win);
+                timer_settime(timer, 0, &timer_int, NULL);
+            }
         }
         fclose(fifo);
         fifo = NULL;
