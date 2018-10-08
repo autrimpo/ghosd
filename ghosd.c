@@ -174,7 +174,9 @@ main(int argc, char **argv)
             } else if (ret == 12 && !strncmp(lineptr, "bg=", 3)) {
                 hextorgba(lineptr + 3, &config.bg);
             } else if (ret >= 10 && !strncmp(lineptr, "timeout=", 8)) {
-                config.timer_int.it_value.tv_sec = atoi(lineptr + 8);
+                config.timer_int.it_value.tv_sec = atoi(lineptr + 8) / 1000;
+                config.timer_int.it_value.tv_nsec =
+                    atoi(lineptr + 8) % 1000 * 1000 * 1000;
             } else if (ret >= 14 && !strncmp(lineptr, "windowsize=", 11)) {
                 geomtovec(lineptr + 11, &config.geom.w, &config.geom.h);
             } else if (ret >= 13 && !strncmp(lineptr, "windowpos=", 10)) {
