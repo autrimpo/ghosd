@@ -1,6 +1,5 @@
 #define GHOSD_FIFO "/tmp/ghosd-fifo"
 
-#include <SDL.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -10,6 +9,10 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+
+#include <fontconfig/fontconfig.h>
+#include <SDL.h>
+#include <SDL_ttf.h>
 
 struct geometry {
     int w;
@@ -22,7 +25,11 @@ struct config {
     timer_t timer;
     struct itimerspec timer_int;
     SDL_Color bg;
+    SDL_Color fg;
     struct geometry geom;
+    char *bodymsg;
+    FcConfig *fccfg;
+    TTF_Font *font;
 };
 
 sig_atomic_t run, timed_out;
@@ -84,8 +91,41 @@ draw(SDL_Window *win, SDL_Renderer *ren, struct config *cfg)
     SDL_ShowWindow(win);
     SDL_SetRenderDrawColor(ren, cfg->bg.r, cfg->bg.g, cfg->bg.b, cfg->bg.a);
     SDL_RenderClear(ren);
+    if (cfg->bodymsg) {
+        SDL_Surface *surf =
+            TTF_RenderText_Blended(cfg->font, cfg->bodymsg, cfg->fg);
+        SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
+        SDL_Rect rect;
+        SDL_QueryTexture(tex, NULL, NULL, &rect.w, &rect.h);
+        rect.x = (cfg->geom.w - rect.w) / 2;
+        rect.y = (cfg->geom.h - rect.h) / 2;
+
+        SDL_RenderCopy(ren, tex, NULL, &rect);
+        SDL_FreeSurface(surf);
+        SDL_DestroyTexture(tex);
+    }
     SDL_RenderPresent(ren);
     timer_settime(cfg->timer, 0, &cfg->timer_int, NULL);
+}
+
+char *
+findfont(struct config *cfg, FcChar8 *pattern)
+{
+    FcPattern *pat = FcNameParse(pattern);
+    FcConfigSubstitute(cfg->fccfg, pat, FcMatchPattern);
+    FcDefaultSubstitute(pat);
+    FcResult res;
+    FcPattern *font = FcFontMatch(cfg->fccfg, pat, &res);
+    FcPatternDestroy(pat);
+    FcChar8 *fontpath;
+    char *ret = NULL;
+    if (FcPatternGetString(font, FC_FILE, 0, &fontpath) == FcResultMatch) {
+        ret = malloc(strlen((char *)fontpath) + 1);
+        strcpy(ret, (char *)fontpath);
+    }
+    FcPatternDestroy(font);
+
+    return ret;
 }
 
 int
@@ -128,13 +168,25 @@ main(int argc, char **argv)
         return 1;
     }
 
+    if (TTF_Init()) {
+        fprintf(stderr, "SDL_TTF failed to initialize: %s\n", TTF_GetError());
+    }
+
     struct config config = {
         .timer     = 0,
         .timer_int = {{0}},
         .bg        = {0, 0, 0, 255},
-        .geom = {640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED}};
+        .fg        = {255, 255, 255, 255},
+        .geom      = {640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED},
+        .bodymsg   = NULL};
     timer_create(CLOCK_REALTIME, &timer_sigev, &config.timer);
     config.timer_int.it_value.tv_sec = 1;
+
+    config.fccfg = FcInitLoadConfigAndFonts();
+
+    char *fontpath = findfont(&config, (FcChar8 *)"monospace");
+    config.font    = TTF_OpenFont(fontpath, 36);
+    free(fontpath);
 
     run = 1;
 
@@ -181,6 +233,14 @@ main(int argc, char **argv)
                 geomtovec(lineptr + 11, &config.geom.w, &config.geom.h);
             } else if (ret >= 13 && !strncmp(lineptr, "windowpos=", 10)) {
                 geomtovec(lineptr + 10, &config.geom.x, &config.geom.y);
+            } else if (ret >= 9 && !strncmp(lineptr, "bodymsg=", 8)) {
+                if (config.bodymsg) {
+                    free(config.bodymsg);
+                }
+                int len        = strlen(lineptr + 8);
+                config.bodymsg = malloc(len);
+                strncpy(config.bodymsg, lineptr + 8, len);
+                config.bodymsg[len - 1] = '\0';
             }
         }
         fclose(fifo);
@@ -192,6 +252,15 @@ main(int argc, char **argv)
     }
 
     free(lineptr);
+    if (config.bodymsg) {
+        free(config.bodymsg);
+    }
+
+    FcConfigDestroy(config.fccfg);
+    timer_delete(config.timer);
+
+    TTF_CloseFont(config.font);
+    TTF_Quit();
 
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
