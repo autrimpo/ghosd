@@ -242,11 +242,11 @@ main(int argc, char **argv)
                     state = BG;
                 } else if (ISCMD("timeout")) {
                     state = TIMEOUT;
-                } else if (ISCMD("windowsize")) {
+                } else if (ISCMD("window-size")) {
                     state = WINDOWSIZE;
-                } else if (ISCMD("windowpos")) {
+                } else if (ISCMD("window-pos")) {
                     state = WINDOWPOS;
-                } else if (ISCMD("bodymsg")) {
+                } else if (ISCMD("body-msg")) {
                     state = BODYMSG;
                 }
                 break;
