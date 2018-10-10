@@ -1,5 +1,5 @@
-image::ghosdcat.png[align="center"]
-image::ghosd.png[align="center"]
+image::img/ghosdcat.png[align="center"]
+image::img/ghosd.png[align="center"]
 
 {empty} +
 
