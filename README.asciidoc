@@ -1,0 +1,57 @@
+image::ghosdcat.png[align="center"]
+image::ghosd.png[align="center"]
+
+{empty} +
+
+*ghosd* is a customizable On Screen Display built with Unix philosophy in mind.
+Not quite _suckless_, but in similar spirit.
+
+# Design philosophy
+The main goal of *ghosd* is to be simple
+yet powerful enough to cover
+a wide variety of use cases.
+It should provide the user with the capabilities to
+display the information they want
+in the way they want it.
+
+*ghosd* has no config file,
+instead being controlled completly through a named pipe.
+This allows for great flexibility
+and integration with other tools and languages.
+
+# Usage
+A named pipe is created at a specified location,
+defaulting to `/tmp/ghosd-fifo`. +
+Commands are written to this pipe
+delimited by a newline `\n` character. +
+If a command requires an argument,
+the argument follows the command
+on a separate line.
+
+An example sequence, setting the background color and showing the osd window:
+
+    bg
+    FF00AA
+    show
+
+For a complete command and usage reference, see link:USAGE.asciidoc[the USAGE file].
+
+The default values for all the settings can be changed in `config.h`.
+
+# Building
+Building *ghosd* requires the following dependencies:
+
+* SDL2
+* SDL2-ttf
+* fontconfig
+
+It uses the Meson build system, so an example build might look like this:
+
+    cd ghosd
+    meson build
+    cd build
+    ninja
+
+# Credits
+Inspired by https://github.com/dapus/mmkeyosd[mmkeyosd]. +
+Ghost cat pixel art created by https://kidmarscat.neocities.org/[MarsCat]. +

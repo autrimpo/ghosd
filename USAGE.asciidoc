@@ -1,0 +1,52 @@
+= ghosd usage guide
+:toc:
+
+== Argument types
+
+=== {time}
+A time duration, in miliseconds.
+Example: `2500`
+
+=== {color}
+An RGB color represented as six hexadecimal characters. +
+Example: `FFAA00`
+
+=== {geometry}
+Two integers delimited by `x`
+representing horizontal and vertical size or offset,
+in pixels. +
+Example: `230x510` +
+Ommiting either of the values is possible,
+in which case the omitted value remains unchanged. +
+Example: `230x` or `x510`.
+
+=== {string}
+A line of UTF-8 encoded text. Can't contain the newline character `\n`. +
+Example: `Hello, world!`
+
+== Commands
+
+=== show
+Displays the *ghosd* window with the current configuration.
+
+=== reset
+Resets the configuration to the default values.
+
+=== quit
+Terminates *ghosd*.
+
+=== timeout _{time}_
+Sets the duration after which the window will disappear.
+
+=== bg _{color}_
+Sets the color of the background.
+
+=== window-pos _{geometry}_
+Sets the position of the window on the screen, as an offset of the top left window
+corner from the top left screen corner.
+
+=== window-size _{geometry}_
+Sets the size of the window.
+
+=== body-msg _{string}_
+Sets the text of the main body area.
