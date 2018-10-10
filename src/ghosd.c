@@ -48,7 +48,7 @@ draw(SDL_Window *win, SDL_Renderer *ren, struct config *cfg)
     SDL_SetRenderDrawColor(ren, cfg->bg.r, cfg->bg.g, cfg->bg.b, cfg->bg.a);
     SDL_RenderClear(ren);
     if (cfg->bodymsg) {
-        SDL_Surface *surf = TTF_RenderText_Blended_Wrapped(
+        SDL_Surface *surf = TTF_RenderUTF8_Blended_Wrapped(
             cfg->font, cfg->bodymsg, cfg->fg, cfg->geom.w - 60);
         SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
         SDL_Rect rect;
