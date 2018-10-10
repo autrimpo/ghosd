@@ -19,10 +19,6 @@ hextorgba(char *hex, SDL_Color *rgba)
     hexpart[0] = hex[4];
     hexpart[1] = hex[5];
     rgba->b    = strtol(hexpart, NULL, 16);
-
-    hexpart[0] = hex[6];
-    hexpart[1] = hex[7];
-    rgba->a    = strtol(hexpart, NULL, 16);
 }
 
 void
