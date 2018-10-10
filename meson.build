@@ -6,4 +6,5 @@ sdl_dep = dependency('SDL2')
 ttf_dep = dependency('SDL2_ttf')
 rt_dep = cc.find_library('rt')
 fc_dep = cc.find_library('fontconfig')
-executable('ghosd', 'ghosd.c', dependencies: [sdl_dep, ttf_dep, rt_dep, fc_dep])
+src = ['ghosd.c', 'helper.c']
+executable('ghosd', sources: src, dependencies: [sdl_dep, ttf_dep, rt_dep, fc_dep])
