@@ -3,13 +3,17 @@
 
 == Argument types
 
+=== {size}
+Size in pixels.
+Example: `40`
+
 === {time}
 A time duration, in miliseconds.
 Example: `2500`
 
 === {color}
-An RGB color represented as six hexadecimal characters. +
-Example: `FFAA00`
+An RGBA color represented as eight hexadecimal characters. +
+Example: `FFAA00FF`
 
 === {geometry}
 Two integers delimited by `x`
@@ -35,10 +39,10 @@ Resets the configuration to the default values.
 === quit
 Terminates *ghosd*.
 
-=== timeout _{time}_
+=== window-timeout _{time}_
 Sets the duration after which the window will disappear.
 
-=== bg _{color}_
+=== window-bg _{color}_
 Sets the color of the background.
 
 === window-pos _{geometry}_
@@ -47,6 +51,9 @@ corner from the top left screen corner.
 
 === window-size _{geometry}_
 Sets the size of the window.
+
+=== window-margin _{size}_
+Sets the margin of the window.
 
 === body-msg _{string}_
 Sets the text of the main body area.

@@ -3,8 +3,7 @@
 
 #include "common.h"
 
-void hextorgba(char *hex, SDL_Color *rgba);
-void geomtovec(char *line, int *x, int *y);
-char *findfont(struct config *cfg, FcChar8 *pattern);
+void hextorgba(char *hex, struct color *rgba);
+void geomtovec(char *line, uint32_t geom[2]);
 
 #endif

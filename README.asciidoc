@@ -30,8 +30,8 @@ on a separate line.
 
 An example sequence, setting the background color and showing the osd window:
 
-    bg
-    FF00AA
+    window-bg
+    FF00AAFF
     show
 
 For a complete command and usage reference, see link:USAGE.asciidoc[the USAGE file].
@@ -41,9 +41,11 @@ The default values for all the settings can be changed in `config.h`.
 # Building
 Building *ghosd* requires the following dependencies:
 
-* SDL2
-* SDL2-ttf
-* fontconfig
+* xcb
+* xcb-icccm
+* xcb-ewmh
+* cairo
+* pango
 
 It uses the Meson build system, so an example build might look like this:
 

@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,14 +9,20 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <fontconfig/fontconfig.h>
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <cairo/cairo-xcb.h>
+#include <cairo/cairo.h>
+#include <pango/pangocairo.h>
+#include <xcb/xcb.h>
+#include <xcb/xcb_ewmh.h>
+#include <xcb/xcb_icccm.h>
 
+#include "config.h"
+#include "draw.h"
 #include "ghosd.h"
 #include "helper.h"
 
 sig_atomic_t run, timed_out;
+pthread_mutex_t lock;
 
 static void
 sighandler(int signo)
@@ -40,60 +47,81 @@ setup_sighandler()
 }
 
 void
-draw(SDL_Window *win, SDL_Renderer *ren, struct config *cfg)
+draw(struct config *cfg)
 {
-    SDL_SetWindowSize(win, cfg->geom.w, cfg->geom.h);
-    SDL_SetWindowPosition(win, cfg->geom.x, cfg->geom.y);
-    SDL_ShowWindow(win);
-    SDL_SetRenderDrawColor(ren, cfg->bg.r, cfg->bg.g, cfg->bg.b, cfg->bg.a);
-    SDL_RenderClear(ren);
-    if (cfg->bodymsg) {
-        SDL_Surface *surf = TTF_RenderUTF8_Blended_Wrapped(
-            cfg->font, cfg->bodymsg, cfg->fg, cfg->geom.w - 60);
-        SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
-        SDL_Rect rect;
-        SDL_QueryTexture(tex, NULL, NULL, &rect.w, &rect.h);
-        rect.x = (cfg->geom.w - rect.w) / 2;
-        rect.y = (cfg->geom.h - rect.h) / 2;
+    draw_pos(cfg);
+    draw_size(cfg);
+    draw_clear(cfg);
+    draw_bg(cfg);
+    draw_body(cfg);
 
-        SDL_RenderCopy(ren, tex, NULL, &rect);
-        SDL_FreeSurface(surf);
-        SDL_DestroyTexture(tex);
-    }
-    SDL_RenderPresent(ren);
-    timer_settime(cfg->timer, 0, &cfg->timer_int, NULL);
+    xcb_flush(cfg->c);
 }
 
 int
-init(SDL_Window **win, SDL_Renderer **ren)
+init(struct config *cfg)
 {
-    if (SDL_Init(SDL_INIT_VIDEO)) {
-        fprintf(stderr, "SDL failed to initialize: %s\n", SDL_GetError());
+    init_config(cfg);
+
+    cfg->c = xcb_connect(NULL, NULL);
+
+    xcb_intern_atom_cookie_t *ewmh_cookie =
+        xcb_ewmh_init_atoms(cfg->c, &cfg->ewmh);
+    if (!xcb_ewmh_init_atoms_replies(&cfg->ewmh, ewmh_cookie, NULL)) {
+        fprintf(stderr, "Could not initialize X connection.\n");
         return 1;
     }
 
-    *win = SDL_CreateWindow("ghosd", SDL_WINDOWPOS_CENTERED,
-                            SDL_WINDOWPOS_CENTERED, 640, 460,
-                            SDL_WINDOW_HIDDEN | SDL_WINDOW_POPUP_MENU);
-    if (!*win) {
-        fprintf(stderr, "SDL failed to create a window: %s\n", SDL_GetError());
-        SDL_Quit();
-        return 1;
+    cfg->screen = cfg->ewmh.screens[0];
+
+    xcb_visualtype_t *visual_type = NULL;
+    xcb_depth_iterator_t depth_iter =
+        xcb_screen_allowed_depths_iterator(cfg->screen);
+
+    if (depth_iter.data) {
+        for (; depth_iter.rem; xcb_depth_next(&depth_iter)) {
+            if (depth_iter.data->depth == 32) {
+                for (xcb_visualtype_iterator_t visual_iter =
+                         xcb_depth_visuals_iterator(depth_iter.data);
+                     visual_iter.rem; xcb_visualtype_next(&visual_iter))
+                    visual_type = visual_iter.data;
+            }
+        }
     }
 
-    *ren = SDL_CreateRenderer(
-        *win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (!*ren) {
-        fprintf(stderr, "SDL failed to create a renderer: %s\n",
-                SDL_GetError());
-        SDL_DestroyWindow(*win);
-        SDL_Quit();
-        return 1;
-    }
+    xcb_colormap_t colormap = xcb_generate_id(cfg->c);
+    xcb_create_colormap(cfg->c, XCB_COLORMAP_ALLOC_NONE, colormap,
+                        cfg->screen->root, visual_type->visual_id);
 
-    if (TTF_Init()) {
-        fprintf(stderr, "SDL_TTF failed to initialize: %s\n", TTF_GetError());
-    }
+    cfg->win = xcb_generate_id(cfg->c);
+
+    uint32_t valwin[4];
+    valwin[0] = 0;
+    valwin[1] = 0;
+    valwin[2] = XCB_EVENT_MASK_EXPOSURE;
+    valwin[3] = colormap;
+    xcb_create_window(cfg->c, 32, cfg->win, cfg->screen->root,
+                      (cfg->screen->width_in_pixels - cfg->size[0]) / 2,
+                      (cfg->screen->height_in_pixels - cfg->size[1]) / 2,
+                      cfg->size[0], cfg->size[1], 0,
+                      XCB_WINDOW_CLASS_INPUT_OUTPUT, visual_type->visual_id,
+                      XCB_CW_BACK_PIXEL | XCB_CW_BORDER_PIXEL |
+                          XCB_CW_EVENT_MASK | XCB_CW_COLORMAP,
+                      valwin);
+
+    xcb_ewmh_set_wm_window_type(&cfg->ewmh, cfg->win, 1,
+                                &cfg->ewmh._NET_WM_WINDOW_TYPE_NOTIFICATION);
+
+    xcb_flush(cfg->c);
+
+    cfg->sfc = cairo_xcb_surface_create(cfg->c, cfg->win, visual_type,
+                                        cfg->size[0], cfg->size[1]);
+    cairo_xcb_surface_set_size(cfg->sfc, cfg->size[0], cfg->size[1]);
+    cfg->cr = cairo_create(cfg->sfc);
+
+    cfg->pl = pango_cairo_create_layout(cfg->cr);
+
+    pthread_mutex_init(&lock, NULL);
 
     return 0;
 }
@@ -111,64 +139,70 @@ init_timer(timer_t *timer)
 void
 reset_config(struct config *cfg)
 {
-    cfg->timer_val->tv_sec  = 1;
-    cfg->timer_val->tv_nsec = 0;
+    cfg->timeout->tv_sec  = S_GET_S(DEFAULT_TIMEOUT);
+    cfg->timeout->tv_nsec = S_GET_NS(DEFAULT_TIMEOUT);
 
-    cfg->bg   = (SDL_Color){0, 0, 0, 255};
-    cfg->fg   = (SDL_Color){255, 255, 255, 255};
-    cfg->geom = (struct geometry){640, 480, SDL_WINDOWPOS_CENTERED,
-                                  SDL_WINDOWPOS_CENTERED};
-    cfg->font = cfg->dflt_font;
+    cfg->bg      = (struct color)DEFAULT_BG;
+    cfg->size[0] = DEFAULT_SIZE_X;
+    cfg->size[1] = DEFAULT_SIZE_Y;
+    cfg->pos[0]  = DEFAULT_POS_X;
+    cfg->pos[1]  = DEFAULT_POS_Y;
+    cfg->margin  = DEFAULT_MARGIN;
 
     check_and_free(cfg->bodymsg);
 }
 
-struct config *
-init_config()
+void
+init_config(struct config *cfg)
 {
-    struct config *cfg = malloc(sizeof(struct config));
-
     init_timer(&cfg->timer);
     cfg->timer_int.it_interval = (struct timespec){0, 0};
-    cfg->timer_val             = &cfg->timer_int.it_value;
+    cfg->timeout               = &cfg->timer_int.it_value;
 
     cfg->bodymsg = NULL;
 
-    cfg->fccfg = FcInitLoadConfigAndFonts();
-
-    char *fontpath = findfont(cfg, (FcChar8 *)"monospace");
-    cfg->dflt_font = TTF_OpenFont(fontpath, 36);
-    free(fontpath);
-
     reset_config(cfg);
-    return cfg;
 }
 
 void
 destroy_config(struct config *cfg)
 {
     check_and_free(cfg->bodymsg);
-    FcConfigDestroy(cfg->fccfg);
     timer_delete(cfg->timer);
-
-    if (cfg->font != cfg->dflt_font) {
-        TTF_CloseFont(cfg->font);
-    }
-    TTF_CloseFont(cfg->dflt_font);
-
-    free(cfg);
 }
 
 void
-destroy(struct config *cfg, SDL_Window *win, SDL_Renderer *ren)
+destroy(struct config *cfg)
 {
+    cairo_surface_destroy(cfg->sfc);
+    cairo_destroy(cfg->cr);
+    xcb_ewmh_connection_wipe(&cfg->ewmh);
+    xcb_disconnect(cfg->c);
     destroy_config(cfg);
+    pthread_mutex_destroy(&lock);
+}
 
-    TTF_Quit();
-
-    SDL_DestroyRenderer(ren);
-    SDL_DestroyWindow(win);
-    SDL_Quit();
+void *
+xev_handle(void *ptr)
+{
+    struct config *cfg = (struct config *)ptr;
+    xcb_generic_event_t *xev;
+    while (run) {
+        xev = xcb_wait_for_event(cfg->c);
+        if (!xev)
+            return 0;
+        switch (xev->response_type) {
+        case XCB_EXPOSE: {
+            xcb_expose_event_t *eev = (xcb_expose_event_t *)xev;
+            if (eev->count == 0) {
+                pthread_mutex_lock(&lock);
+                draw(cfg);
+                pthread_mutex_unlock(&lock);
+            }
+        } break;
+        }
+    }
+    return NULL;
 }
 
 int
@@ -180,13 +214,11 @@ main(int argc, char **argv)
     unlink(GHOSD_FIFO);
     mkfifo(GHOSD_FIFO, 0644);
 
-    SDL_Renderer *ren;
-    SDL_Window *win;
-    if (init(&win, &ren)) {
+    struct config cfg;
+
+    if (init(&cfg)) {
         return -1;
     }
-
-    struct config *cfg = init_config();
 
     size_t ret;
     size_t linelen = 100;
@@ -195,7 +227,7 @@ main(int argc, char **argv)
     line = malloc(linelen);
     if (!line) {
         fprintf(stderr, "Failed to allocate a line buffer.\n");
-        destroy(cfg, win, ren);
+        destroy(&cfg);
         return -1;
     }
 
@@ -206,17 +238,22 @@ main(int argc, char **argv)
         TIMEOUT,
         WINDOWSIZE,
         WINDOWPOS,
+        MARGIN,
         BODYMSG,
     } state;
 
     run   = 1;
     state = INIT;
 
+    pthread_t xev_thread;
+    pthread_create(&xev_thread, NULL, xev_handle, (void *)&cfg);
+
     while (run) {
         fifo = fopen(GHOSD_FIFO, "r");
         if (!fifo && errno == EINTR) {
             if (timed_out) {
-                SDL_HideWindow(win);
+                xcb_unmap_window(cfg.c, cfg.win);
+                xcb_flush(cfg.c);
                 timed_out = 0;
             }
             continue;
@@ -228,56 +265,71 @@ main(int argc, char **argv)
         while (ret != -1) {
             ret = getline(&line, &linelen, fifo);
             if (ret == -1 && errno == EINTR) {
-                ret = 0;
+                ret   = 0;
+                errno = 0;
                 continue;
             }
             if (!run || ret == -1) {
                 break;
             }
+            pthread_mutex_lock(&lock);
             switch (state) {
             case INIT:
                 if (ISCMD("show")) {
-                    draw(win, ren, cfg);
-                } else if (ISCMD("bg")) {
+                    xcb_map_window(cfg.c, cfg.win);
+                    xcb_flush(cfg.c);
+                    draw(&cfg);
+                    timer_settime(cfg.timer, 0, &cfg.timer_int, NULL);
+                } else if (ISCMD("window-bg")) {
                     state = BG;
-                } else if (ISCMD("timeout")) {
+                } else if (ISCMD("window-timeout")) {
                     state = TIMEOUT;
                 } else if (ISCMD("window-size")) {
                     state = WINDOWSIZE;
                 } else if (ISCMD("window-pos")) {
                     state = WINDOWPOS;
+                } else if (ISCMD("window-margin")) {
+                    state = MARGIN;
                 } else if (ISCMD("body-msg")) {
                     state = BODYMSG;
+                } else if (ISCMD("quit")) {
+                    run = 0;
+                    break;
                 }
                 break;
             case BG:
                 state = INIT;
-                hextorgba(line, &cfg->bg);
+                hextorgba(line, &cfg.bg);
                 break;
             case TIMEOUT:
-                state                   = INIT;
-                cfg->timer_val->tv_sec  = atoi(line) / 1000;
-                cfg->timer_val->tv_nsec = atoi(line) % 1000 * 1000 * 1000;
+                state                = INIT;
+                cfg.timeout->tv_sec  = S_GET_S(atoi(line));
+                cfg.timeout->tv_nsec = S_GET_NS(atoi(line));
                 break;
             case WINDOWSIZE:
                 state = INIT;
-                geomtovec(line, &cfg->geom.w, &cfg->geom.h);
+                geomtovec(line, cfg.size);
                 break;
             case WINDOWPOS:
                 state = INIT;
-                geomtovec(line, &cfg->geom.x, &cfg->geom.y);
+                geomtovec(line, cfg.pos);
                 break;
             case BODYMSG:
                 state = INIT;
-                check_and_free(cfg->bodymsg);
-                int len      = strlen(line);
-                cfg->bodymsg = malloc(len);
-                strncpy(cfg->bodymsg, line, len);
-                cfg->bodymsg[len - 1] = '\0';
+                check_and_free(cfg.bodymsg);
+                int len     = strlen(line);
+                cfg.bodymsg = malloc(len);
+                strncpy(cfg.bodymsg, line, len);
+                cfg.bodymsg[len - 1] = '\0';
+                break;
+            case MARGIN:
+                state      = INIT;
+                cfg.margin = atoi(line);
                 break;
             default:
                 break;
             }
+            pthread_mutex_unlock(&lock);
         }
         fclose(fifo);
         fifo = NULL;
@@ -287,8 +339,13 @@ main(int argc, char **argv)
         fclose(fifo);
     }
 
+    xcb_expose_event_t event = {0};
+    xcb_send_event(cfg.c, 0, cfg.win, XCB_EVENT_MASK_EXPOSURE, (char *)&event);
+    xcb_flush(cfg.c);
+    pthread_join(xev_thread, NULL);
+
     check_and_free(line);
-    destroy(cfg, win, ren);
+    destroy(&cfg);
 
     return 0;
 }
