@@ -49,7 +49,7 @@ draw_body(struct config *cfg)
     }
     pango_layout_set_text(cfg->pl, cfg->bodymsg, -1);
     PangoFontDescription *desc =
-        pango_font_description_from_string("monospace");
+        pango_font_description_from_string(cfg->bodyfont);
     pango_layout_set_font_description(cfg->pl, desc);
     pango_font_description_free(desc);
 

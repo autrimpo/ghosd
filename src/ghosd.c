@@ -150,6 +150,10 @@ reset_config(struct config *cfg)
     cfg->margin  = DEFAULT_MARGIN;
 
     check_and_free(cfg->bodymsg);
+    if (cfg->bodyfont != cfg->defaultbodyfont) {
+        check_and_free(cfg->bodyfont);
+        cfg->bodyfont = cfg->defaultbodyfont;
+    }
 }
 
 void
@@ -159,7 +163,9 @@ init_config(struct config *cfg)
     cfg->timer_int.it_interval = (struct timespec){0, 0};
     cfg->timeout               = &cfg->timer_int.it_value;
 
-    cfg->bodymsg = NULL;
+    cfg->bodymsg         = NULL;
+    cfg->bodyfont        = NULL;
+    cfg->defaultbodyfont = DEFAULT_BODY_FONT;
 
     reset_config(cfg);
 }
@@ -168,6 +174,10 @@ void
 destroy_config(struct config *cfg)
 {
     check_and_free(cfg->bodymsg);
+
+    if (cfg->bodyfont != cfg->defaultbodyfont) {
+        free(cfg->bodyfont);
+    }
     timer_delete(cfg->timer);
 }
 
@@ -276,10 +286,12 @@ main(int argc, char **argv)
         WINDOWPOS,
         MARGIN,
         BODYMSG,
+        BODYFONT,
     } state;
 
     run   = 1;
     state = INIT;
+    int len;
 
     pthread_t xev_thread;
     pthread_create(&xev_thread, NULL, xev_handle, (void *)&cfg);
@@ -328,6 +340,8 @@ main(int argc, char **argv)
                     state = MARGIN;
                 } else if (ISCMD("body-msg")) {
                     state = BODYMSG;
+                } else if (ISCMD("body-font")) {
+                    state = BODYFONT;
                 } else if (ISCMD("quit")) {
                     run = 0;
                     break;
@@ -353,10 +367,20 @@ main(int argc, char **argv)
             case BODYMSG:
                 state = INIT;
                 check_and_free(cfg.bodymsg);
-                int len     = strlen(line);
+                len         = strlen(line);
                 cfg.bodymsg = malloc(len);
                 strncpy(cfg.bodymsg, line, len);
                 cfg.bodymsg[len - 1] = '\0';
+                break;
+            case BODYFONT:
+                state = INIT;
+                if (cfg.bodyfont != cfg.defaultbodyfont) {
+                    free(cfg.bodyfont);
+                }
+                len          = strlen(line);
+                cfg.bodyfont = malloc(len);
+                strncpy(cfg.bodyfont, line, len);
+                cfg.bodyfont[len - 1] = '\0';
                 break;
             case MARGIN:
                 state      = INIT;

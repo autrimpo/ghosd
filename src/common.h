@@ -42,6 +42,8 @@ struct config {
     uint32_t size[2];
     struct color bg;
     char *bodymsg;
+    char *bodyfont;
+    char *defaultbodyfont;
     int margin;
 };
 
