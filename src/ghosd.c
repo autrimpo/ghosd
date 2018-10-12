@@ -205,14 +205,50 @@ xev_handle(void *ptr)
     return NULL;
 }
 
+void
+print_help(char *bin)
+{
+    printf("%s [-h|-v|-f FIFO_PATH]\n \
+\t-h: show help\n \
+\t-v: show version\n \
+\t-f FIFO_PATH: set the location of fifo used for communication\n",
+           bin);
+}
+
+void
+print_version()
+{
+    printf("ghosd %s\n", VERSION);
+}
+
 int
 main(int argc, char **argv)
 {
+    int opt;
+    char *fifo_path = DEFAULT_FIFO;
+
+    while ((opt = getopt(argc, argv, "hvf:")) != -1) {
+        switch (opt) {
+        case 'v':
+            print_version();
+            return 0;
+        case 'f':
+            fifo_path = optarg;
+            break;
+        case 'h':
+            print_help(argv[0]);
+            return 0;
+        default:
+            print_help(argv[0]);
+            return -1;
+        }
+    }
+
     setup_sighandler();
 
     FILE *fifo = NULL;
-    unlink(GHOSD_FIFO);
-    mkfifo(GHOSD_FIFO, 0644);
+    unlink(fifo_path);
+    mkfifo(fifo_path, 0644);
 
     struct config cfg;
 
@@ -249,7 +285,7 @@ main(int argc, char **argv)
     pthread_create(&xev_thread, NULL, xev_handle, (void *)&cfg);
 
     while (run) {
-        fifo = fopen(GHOSD_FIFO, "r");
+        fifo = fopen(fifo_path, "r");
         if (!fifo && errno == EINTR) {
             if (timed_out) {
                 xcb_unmap_window(cfg.c, cfg.win);
@@ -338,6 +374,8 @@ main(int argc, char **argv)
     if (fifo) {
         fclose(fifo);
     }
+
+    unlink(fifo_path);
 
     xcb_expose_event_t event = {0};
     xcb_send_event(cfg.c, 0, cfg.win, XCB_EVENT_MASK_EXPOSURE, (char *)&event);

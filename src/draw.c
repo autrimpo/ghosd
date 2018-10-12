@@ -6,10 +6,10 @@ void
 draw_pos(struct config *cfg)
 {
     uint32_t pos[2];
-    pos[0] = cfg->pos[0] == -1
+    pos[0] = cfg->pos[0] == POSITION_CENTER
                  ? (cfg->screen->width_in_pixels - cfg->size[0]) / 2
                  : cfg->pos[0];
-    pos[1] = cfg->pos[1] == -1
+    pos[1] = cfg->pos[1] == POSITION_CENTER
                  ? (cfg->screen->height_in_pixels - cfg->size[1]) / 2
                  : cfg->pos[1];
     xcb_configure_window(cfg->c, cfg->win,

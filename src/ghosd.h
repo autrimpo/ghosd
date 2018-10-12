@@ -5,8 +5,6 @@
 
 #include "common.h"
 
-#define GHOSD_FIFO "/tmp/ghosd-fifo"
-
 #define check_and_free(ptr)                                                    \
     if (ptr)                                                                   \
         free(ptr);                                                             \
@@ -18,6 +16,8 @@
 #define ISCMD(CMD)                                                             \
     (ret == strlen(CMD "\n") && !strncmp(line, CMD "\n", strlen(CMD "\n")))
 
+#define VERSION "0.1"
+
 void setup_sighandler();
 void draw(struct config *cfg);
 int init(struct config *cfg);
@@ -27,5 +27,8 @@ void reset_config(struct config *cfg);
 void init_config(struct config *cfg);
 void destroy_config(struct config *cfg);
 void destroy(struct config *cfg);
+
+void print_help(char *bin);
+void print_version();
 
 #endif

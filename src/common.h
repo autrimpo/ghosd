@@ -8,6 +8,8 @@
 #include <xcb/xcb.h>
 #include <xcb/xcb_ewmh.h>
 
+#define POSITION_CENTER -1
+
 struct color {
     float r;
     float g;
