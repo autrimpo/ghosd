@@ -218,10 +218,9 @@ xev_handle(void *ptr)
 void
 print_help(char *bin)
 {
-    printf("%s [-h|-v|-f FIFO_PATH]\n \
+    printf("%s [-h|-v]\n \
 \t-h: show help\n \
-\t-v: show version\n \
-\t-f FIFO_PATH: set the location of fifo used for communication\n",
+\t-v: show version\n",
            bin);
 }
 
@@ -235,16 +234,12 @@ int
 main(int argc, char **argv)
 {
     int opt;
-    char *fifo_path = DEFAULT_FIFO;
 
-    while ((opt = getopt(argc, argv, "hvf:")) != -1) {
+    while ((opt = getopt(argc, argv, "hv")) != -1) {
         switch (opt) {
         case 'v':
             print_version();
             return 0;
-        case 'f':
-            fifo_path = optarg;
-            break;
         case 'h':
             print_help(argv[0]);
             return 0;
@@ -256,7 +251,13 @@ main(int argc, char **argv)
 
     setup_sighandler();
 
-    FILE *fifo = NULL;
+    char *fifo_path = getenv("GHOSD_FIFO");
+    FILE *fifo;
+
+    if (!fifo_path) {
+        fifo_path = DEFAULT_FIFO;
+    }
+
     unlink(fifo_path);
     mkfifo(fifo_path, 0644);
 
@@ -277,6 +278,10 @@ main(int argc, char **argv)
         return -1;
     }
 
+    pthread_t xev_thread;
+
+    pthread_create(&xev_thread, NULL, xev_handle, (void *)&cfg);
+
     enum {
         INIT,
         SHOW,
@@ -289,12 +294,10 @@ main(int argc, char **argv)
         BODYFONT,
     } state;
 
-    run   = 1;
     state = INIT;
-    int len;
 
-    pthread_t xev_thread;
-    pthread_create(&xev_thread, NULL, xev_handle, (void *)&cfg);
+    run = 1;
+    int len;
 
     while (run) {
         fifo = fopen(fifo_path, "r");
