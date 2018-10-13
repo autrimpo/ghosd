@@ -445,7 +445,7 @@ main(int argc, char **argv)
                 break;
             case TITLEFONT:
                 state = INIT;
-                if (cfg.titlefont != cfg.defaultbodyfont) {
+                if (cfg.titlefont != cfg.defaulttitlefont) {
                     free(cfg.titlefont);
                 }
                 linetostr(line, &cfg.titlefont);
