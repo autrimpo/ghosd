@@ -1,6 +1,11 @@
 = Changelog
 :toc:
 
+== v0.2.1 - 2018-10-13
+=== Fixed
+    * Incorrectly comparing body font to default title font, leading to a crash when the user tried to set the title font.
+    * Incorrectly handling the bar values.
+
 == v0.2.0 - 2018-10-13
 === Added
     * A table of contents to changelog.
