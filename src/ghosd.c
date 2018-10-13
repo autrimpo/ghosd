@@ -405,15 +405,15 @@ main(int argc, char **argv)
                 break;
             case BODYBARHEIGHT:
                 state          = INIT;
-                cfg.bar.height = atoi(line) / 100;
+                cfg.bar.height = atoi(line) / 100.0;
                 break;
             case BODYBARVAL:
                 state       = INIT;
-                cfg.bar.val = atoi(line) / 100;
+                cfg.bar.val = atoi(line) / 100.0;
                 break;
             case BODYBARWIDTH:
                 state         = INIT;
-                cfg.bar.width = atoi(line) / 100;
+                cfg.bar.width = atoi(line) / 100.0;
                 break;
             case BODYCOLOR:
                 state = INIT;
