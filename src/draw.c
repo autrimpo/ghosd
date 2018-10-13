@@ -53,7 +53,8 @@ draw_clear(struct config *cfg)
 void
 draw_bg(struct config *cfg)
 {
-    cairo_set_source_rgba(cfg->cr, cfg->bg.r, cfg->bg.g, cfg->bg.b, cfg->bg.a);
+    struct color *clr = &cfg->bg;
+    cairo_set_source_rgba(cfg->cr, clr->r, clr->g, clr->b, clr->a);
     cairo_paint(cfg->cr);
 }
 
@@ -73,7 +74,9 @@ draw_body(struct config *cfg)
     get_title_height(cfg, &title_offset);
     title_offset += title_offset ? cfg->margin * 0.5 : 0;
 
-    cairo_set_source_rgb(cfg->cr, 1, 1, 1);
+    struct color *clr = &cfg->bodycolor;
+    cairo_set_source_rgba(cfg->cr, clr->r, clr->g, clr->b, clr->a);
+
     cairo_move_to(cfg->cr, cfg->margin, cfg->margin + title_offset);
     pango_layout_set_width(cfg->pl,
                            (cfg->size[0] - 2 * cfg->margin) * PANGO_SCALE);
@@ -94,7 +97,9 @@ draw_title(struct config *cfg)
     pango_layout_set_font_description(cfg->pl, desc);
     pango_font_description_free(desc);
 
-    cairo_set_source_rgb(cfg->cr, 1, 1, 1);
+    struct color *clr = &cfg->titlecolor;
+    cairo_set_source_rgba(cfg->cr, clr->r, clr->g, clr->b, clr->a);
+
     cairo_move_to(cfg->cr, cfg->margin, cfg->margin);
     pango_layout_set_width(cfg->pl,
                            (cfg->size[0] - 2 * cfg->margin) * PANGO_SCALE);

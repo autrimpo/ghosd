@@ -45,11 +45,13 @@ struct config {
 
     PangoAlignment bodyalign;
     char *defaultbodyfont;
+    struct color bodycolor;
     char *bodyfont;
     char *bodymsg;
 
     PangoAlignment titlealign;
     char *defaulttitlefont;
+    struct color titlecolor;
     char *titlefont;
     char *titlemsg;
 };

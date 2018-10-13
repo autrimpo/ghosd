@@ -8,6 +8,8 @@
     * The `title-msg` command.
     * The `body-align` command.
     * The `title-align` command.
+    * The `body-color` command.
+    * The `title-color` command.
 
 === Changed
     * Updated documentation to be ordered more logically.

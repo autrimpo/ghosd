@@ -140,6 +140,7 @@ void
 reset_config(struct config *cfg)
 {
     linetoalign(&cfg->bodyalign, DEFAULT_BODY_ALIGN"\n");
+    cfg->bodycolor               = (struct color)DEFAULT_BODY_COLOR;
     if (cfg->bodyfont != cfg->defaultbodyfont) {
         check_and_free(cfg->bodyfont);
         cfg->bodyfont = cfg->defaultbodyfont;
@@ -147,6 +148,7 @@ reset_config(struct config *cfg)
     check_and_free(cfg->bodymsg);
 
     linetoalign(&cfg->titlealign, DEFAULT_TITLE_ALIGN"\n");
+    cfg->titlecolor               = (struct color)DEFAULT_TITLE_COLOR;
     if (cfg->titlefont != cfg->defaulttitlefont) {
         check_and_free(cfg->titlefont);
         cfg->titlefont = cfg->defaulttitlefont;
@@ -296,10 +298,12 @@ main(int argc, char **argv)
     enum {
         INIT,
         BODYALIGN,
+        BODYCOLOR,
         BODYFONT,
         BODYMSG,
         SHOW,
         TITLEALIGN,
+        TITLECOLOR,
         TITLEFONT,
         TITLEMSG,
         WINDOWBG,
@@ -353,12 +357,16 @@ main(int argc, char **argv)
                     break;
                 } else if (ISCMD("body-align")) {
                     state = BODYALIGN;
+                } else if (ISCMD("body-color")) {
+                    state = BODYCOLOR;
                 } else if (ISCMD("body-font")) {
                     state = BODYFONT;
                 } else if (ISCMD("body-msg")) {
                     state = BODYMSG;
                 } else if (ISCMD("title-align")) {
                     state = TITLEALIGN;
+                } else if (ISCMD("title-color")) {
+                    state = TITLECOLOR;
                 } else if (ISCMD("title-font")) {
                     state = TITLEFONT;
                 } else if (ISCMD("title-msg")) {
@@ -379,6 +387,10 @@ main(int argc, char **argv)
                 state = INIT;
                 linetoalign(&cfg.bodyalign, line);
                 break;
+            case BODYCOLOR:
+                state = INIT;
+                hextorgba(line, &cfg.bodycolor);
+                break;
             case BODYFONT:
                 state = INIT;
                 if (cfg.bodyfont != cfg.defaultbodyfont) {
@@ -394,6 +406,10 @@ main(int argc, char **argv)
             case TITLEALIGN:
                 state = INIT;
                 linetoalign(&cfg.titlealign, line);
+                break;
+            case TITLECOLOR:
+                state = INIT;
+                hextorgba(line, &cfg.titlecolor);
                 break;
             case TITLEFONT:
                 state = INIT;

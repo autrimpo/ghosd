@@ -40,6 +40,15 @@ It reads a series of commands, each on a separate line\&. If the command require
 .SH "COMMANDS REFERENCE"
 .SS "Arguments"
 .PP
+\fIalign\fR
+.RS 4
+Text alignment, one of
+\fIleft\fR
+\fIright\fR
+or
+\fIcenter\fR\&.
+.RE
+.PP
 \fIcolor\fR
 .RS 4
 RGBA color in hexadecimal format\&.
@@ -109,6 +118,16 @@ Terminates
 \fBBody\fR
 .RS 4
 .PP
+\fIbody\-align <align>\fR
+.RS 4
+Sets the alignment of the main body area\&.
+.RE
+.PP
+\fIbody\-color <color>\fR
+.RS 4
+Sets the color of the main body area\&.
+.RE
+.PP
 \fIbody\-font <font>\fR
 .RS 4
 Sets the font of the main body area\&.
@@ -127,6 +146,16 @@ Sets the text of the main body area\&.
 .ps +1
 \fBTitle\fR
 .RS 4
+.PP
+\fItitle\-align <align>\fR
+.RS 4
+Sets the alignment of the title\&.
+.RE
+.PP
+\fItitle\-color <color>\fR
+.RS 4
+Sets the color of the title\&.
+.RE
 .PP
 \fItitle\-font <font>\fR
 .RS 4
