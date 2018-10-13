@@ -71,6 +71,14 @@ on the next line.
 'body-msg <string>' ::
     Sets the text of the main body area.
 
+==== Title
+
+'title-font <font>' ::
+    Sets the font of the title.
+
+'title-msg <string>' ::
+    Sets the text of the title.
+
 ==== Window
 
 'window-bg <color>' ::

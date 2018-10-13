@@ -37,14 +37,19 @@ struct config {
     struct itimerspec timer_int;
 
     /* ghosd */
-    struct timespec *timeout;
+    struct color bg;
+    int margin;
     uint32_t pos[2];
     uint32_t size[2];
-    struct color bg;
-    char *bodymsg;
-    char *bodyfont;
+    struct timespec *timeout;
+
     char *defaultbodyfont;
-    int margin;
+    char *bodyfont;
+    char *bodymsg;
+
+    char *defaulttitlefont;
+    char *titlefont;
+    char *titlemsg;
 };
 
 #endif

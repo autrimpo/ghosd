@@ -52,6 +52,7 @@ draw(struct config *cfg)
     draw_size(cfg);
     draw_clear(cfg);
     draw_bg(cfg);
+    draw_title(cfg);
     draw_body(cfg);
 
     xcb_flush(cfg->c);
@@ -138,21 +139,26 @@ init_timer(timer_t *timer)
 void
 reset_config(struct config *cfg)
 {
-    cfg->timeout->tv_sec  = S_GET_S(DEFAULT_TIMEOUT);
-    cfg->timeout->tv_nsec = S_GET_NS(DEFAULT_TIMEOUT);
-
-    cfg->bg      = (struct color)DEFAULT_BG;
-    cfg->size[0] = DEFAULT_SIZE_X;
-    cfg->size[1] = DEFAULT_SIZE_Y;
-    cfg->pos[0]  = DEFAULT_POS_X;
-    cfg->pos[1]  = DEFAULT_POS_Y;
-    cfg->margin  = DEFAULT_MARGIN;
-
-    check_and_free(cfg->bodymsg);
     if (cfg->bodyfont != cfg->defaultbodyfont) {
         check_and_free(cfg->bodyfont);
         cfg->bodyfont = cfg->defaultbodyfont;
     }
+    check_and_free(cfg->bodymsg);
+
+    if (cfg->titlefont != cfg->defaulttitlefont) {
+        check_and_free(cfg->titlefont);
+        cfg->titlefont = cfg->defaulttitlefont;
+    }
+    check_and_free(cfg->titlemsg);
+
+    cfg->bg               = (struct color)DEFAULT_WINDOW_BG;
+    cfg->margin           = DEFAULT_WINDOW_MARGIN;
+    cfg->pos[0]           = DEFAULT_WINDOW_POS_X;
+    cfg->pos[1]           = DEFAULT_WINDOW_POS_Y;
+    cfg->size[0]          = DEFAULT_WINDOW_SIZE_X;
+    cfg->size[1]          = DEFAULT_WINDOW_SIZE_Y;
+    cfg->timeout->tv_sec  = S_GET_S(DEFAULT_WINDOW_TIMEOUT);
+    cfg->timeout->tv_nsec = S_GET_NS(DEFAULT_WINDOW_TIMEOUT);
 }
 
 void
@@ -165,6 +171,10 @@ init_config(struct config *cfg)
     cfg->bodymsg         = NULL;
     cfg->bodyfont        = NULL;
     cfg->defaultbodyfont = DEFAULT_BODY_FONT;
+
+    cfg->titlemsg         = NULL;
+    cfg->titlefont        = NULL;
+    cfg->defaulttitlefont = DEFAULT_TITLE_FONT;
 
     reset_config(cfg);
 }
@@ -286,6 +296,8 @@ main(int argc, char **argv)
         BODYFONT,
         BODYMSG,
         SHOW,
+        TITLEFONT,
+        TITLEMSG,
         WINDOWBG,
         WINDOWMARGIN,
         WINDOWPOS,
@@ -296,7 +308,6 @@ main(int argc, char **argv)
     state = INIT;
 
     run = 1;
-    int len;
 
     while (run) {
         fifo = fopen(fifo_path, "r");
@@ -330,26 +341,30 @@ main(int argc, char **argv)
                     xcb_flush(cfg.c);
                     draw(&cfg);
                     timer_settime(cfg.timer, 0, &cfg.timer_int, NULL);
-                } else if (ISCMD("window-bg")) {
-                    state = WINDOWBG;
-                } else if (ISCMD("window-timeout")) {
-                    state = WINDOWTIMEOUT;
-                } else if (ISCMD("window-size")) {
-                    state = WINDOWSIZE;
-                } else if (ISCMD("window-pos")) {
-                    state = WINDOWPOS;
-                } else if (ISCMD("window-margin")) {
-                    state = WINDOWMARGIN;
-                } else if (ISCMD("body-msg")) {
-                    state = BODYMSG;
-                } else if (ISCMD("body-font")) {
-                    state = BODYFONT;
                 } else if (ISCMD("reset")) {
                     reset_config(&cfg);
                     break;
                 } else if (ISCMD("quit")) {
                     run = 0;
                     break;
+                } else if (ISCMD("body-font")) {
+                    state = BODYFONT;
+                } else if (ISCMD("body-msg")) {
+                    state = BODYMSG;
+                } else if (ISCMD("title-font")) {
+                    state = TITLEFONT;
+                } else if (ISCMD("title-msg")) {
+                    state = TITLEMSG;
+                } else if (ISCMD("window-bg")) {
+                    state = WINDOWBG;
+                } else if (ISCMD("window-margin")) {
+                    state = WINDOWMARGIN;
+                } else if (ISCMD("window-pos")) {
+                    state = WINDOWPOS;
+                } else if (ISCMD("window-size")) {
+                    state = WINDOWSIZE;
+                } else if (ISCMD("window-timeout")) {
+                    state = WINDOWTIMEOUT;
                 }
                 break;
             case BODYFONT:
@@ -357,18 +372,24 @@ main(int argc, char **argv)
                 if (cfg.bodyfont != cfg.defaultbodyfont) {
                     free(cfg.bodyfont);
                 }
-                len          = strlen(line);
-                cfg.bodyfont = malloc(len);
-                strncpy(cfg.bodyfont, line, len);
-                cfg.bodyfont[len - 1] = '\0';
+                linetostr(line, &cfg.bodyfont);
                 break;
             case BODYMSG:
                 state = INIT;
                 check_and_free(cfg.bodymsg);
-                len         = strlen(line);
-                cfg.bodymsg = malloc(len);
-                strncpy(cfg.bodymsg, line, len);
-                cfg.bodymsg[len - 1] = '\0';
+                linetostr(line, &cfg.bodymsg);
+                break;
+            case TITLEFONT:
+                state = INIT;
+                if (cfg.titlefont != cfg.defaultbodyfont) {
+                    free(cfg.titlefont);
+                }
+                linetostr(line, &cfg.titlefont);
+                break;
+            case TITLEMSG:
+                state = INIT;
+                check_and_free(cfg.titlemsg);
+                linetostr(line, &cfg.titlemsg);
                 break;
             case WINDOWBG:
                 state = INIT;

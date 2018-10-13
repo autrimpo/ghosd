@@ -53,6 +53,14 @@ Sets the font of the main body area.
 ==== body-msg _<string>_
 Sets the text of the main body area.
 
+=== Title
+
+==== title-font _<font>_
+Sets the font of the title.
+
+==== title-msg _<string>_
+Sets the text of the title.
+
 === Window
 
 ==== window-bg _<color>_

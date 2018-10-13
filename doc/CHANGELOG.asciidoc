@@ -4,19 +4,21 @@
 == v0.2.0 [unreleased]
 === Added
     * A table of contents to changelog.
+    * The `title-font` command.
+    * The `title-msg` command.
 
 === Changed
     * Updated documentation to be ordered more logically.
 
 == v0.1.0 - 2018-10-13
 === Added
-    * `show` command
-    * `reset` command
-    * `quit` command
-    * `window-timeout` command
-    * `window-bg` command
-    * `window-size` command
-    * `window-pos` command
-    * `window-margin` command
-    * `body-msg` command
-    * `body-font` command
+    * The `show` command.
+    * The `reset` command.
+    * The `quit` command.
+    * The `body-font` command.
+    * The `body-msg` command.
+    * The `window-bg` command.
+    * The `window-margin` command.
+    * The `window-pos` command.
+    * The `window-size` command.
+    * The `window-timeout` command.

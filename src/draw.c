@@ -1,6 +1,22 @@
 #include <cairo/cairo-xcb.h>
+#include <pango/pango.h>
 
 #include "draw.h"
+
+static void
+get_title_height(struct config *cfg, int *height)
+{
+    if (!cfg->titlemsg) {
+        return;
+    }
+    PangoLayout *pl = pango_cairo_create_layout(cfg->cr);
+    pango_layout_set_text(pl, cfg->titlemsg, -1);
+    PangoFontDescription *desc =
+        pango_font_description_from_string(cfg->titlefont);
+    pango_layout_set_font_description(pl, desc);
+    pango_font_description_free(desc);
+    pango_layout_get_pixel_size(pl, NULL, height);
+}
 
 void
 draw_pos(struct config *cfg)
@@ -50,6 +66,30 @@ draw_body(struct config *cfg)
     pango_layout_set_text(cfg->pl, cfg->bodymsg, -1);
     PangoFontDescription *desc =
         pango_font_description_from_string(cfg->bodyfont);
+    pango_layout_set_font_description(cfg->pl, desc);
+    pango_font_description_free(desc);
+
+    int title_offset = 0;
+    get_title_height(cfg, &title_offset);
+    title_offset += title_offset ? cfg->margin * 0.5 : 0;
+
+    cairo_set_source_rgb(cfg->cr, 1, 1, 1);
+    cairo_move_to(cfg->cr, cfg->margin, cfg->margin + title_offset);
+    pango_layout_set_width(cfg->pl,
+                           (cfg->size[0] - 2 * cfg->margin) * PANGO_SCALE);
+    pango_cairo_update_layout(cfg->cr, cfg->pl);
+    pango_cairo_show_layout(cfg->cr, cfg->pl);
+}
+
+void
+draw_title(struct config *cfg)
+{
+    if (!cfg->titlemsg) {
+        return;
+    }
+    pango_layout_set_text(cfg->pl, cfg->titlemsg, -1);
+    PangoFontDescription *desc =
+        pango_font_description_from_string(cfg->titlefont);
     pango_layout_set_font_description(cfg->pl, desc);
     pango_font_description_free(desc);
 
