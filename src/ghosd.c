@@ -345,6 +345,9 @@ main(int argc, char **argv)
                     state = BODYMSG;
                 } else if (ISCMD("body-font")) {
                     state = BODYFONT;
+                } else if (ISCMD("reset")) {
+                    reset_config(&cfg);
+                    break;
                 } else if (ISCMD("quit")) {
                     run = 0;
                     break;
