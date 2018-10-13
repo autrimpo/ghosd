@@ -42,7 +42,6 @@ The default values for all the settings can be changed in `config.h`.
 Building *ghosd* requires the following dependencies:
 
 * xcb
-* xcb-icccm
 * xcb-ewmh
 * cairo
 * pango
