@@ -1,7 +1,9 @@
 #define DEFAULT_FIFO "/tmp/ghosd-fifo"
 
+#define DEFAULT_BODY_ALIGN "center"
 #define DEFAULT_BODY_FONT "monospace 12"
 
+#define DEFAULT_TITLE_ALIGN "center"
 #define DEFAULT_TITLE_FONT "monospace 24"
 
 #define DEFAULT_WINDOW_BG                                                      \

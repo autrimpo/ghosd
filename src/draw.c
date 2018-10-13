@@ -77,6 +77,7 @@ draw_body(struct config *cfg)
     cairo_move_to(cfg->cr, cfg->margin, cfg->margin + title_offset);
     pango_layout_set_width(cfg->pl,
                            (cfg->size[0] - 2 * cfg->margin) * PANGO_SCALE);
+    pango_layout_set_alignment(cfg->pl, cfg->bodyalign);
     pango_cairo_update_layout(cfg->cr, cfg->pl);
     pango_cairo_show_layout(cfg->cr, cfg->pl);
 }
@@ -97,6 +98,7 @@ draw_title(struct config *cfg)
     cairo_move_to(cfg->cr, cfg->margin, cfg->margin);
     pango_layout_set_width(cfg->pl,
                            (cfg->size[0] - 2 * cfg->margin) * PANGO_SCALE);
+    pango_layout_set_alignment(cfg->pl, cfg->titlealign);
     pango_cairo_update_layout(cfg->cr, cfg->pl);
     pango_cairo_show_layout(cfg->cr, cfg->pl);
 }

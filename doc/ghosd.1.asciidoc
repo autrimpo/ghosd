@@ -32,6 +32,9 @@ on the next line.
 
 === Arguments
 
+'align' ::
+    Text alignment, one of 'left' 'right' or 'center'.
+
 'color' ::
     RGBA color in hexadecimal format.
 
@@ -65,6 +68,9 @@ on the next line.
 
 ==== Body
 
+'body-align <align>' ::
+    Sets the alignment of the main body area.
+
 'body-font <font>' ::
     Sets the font of the main body area.
 
@@ -72,6 +78,9 @@ on the next line.
     Sets the text of the main body area.
 
 ==== Title
+
+'title-align <align>' ::
+    Sets the alignment of the title.
 
 'title-font <font>' ::
     Sets the font of the title.

@@ -6,6 +6,8 @@
     * A table of contents to changelog.
     * The `title-font` command.
     * The `title-msg` command.
+    * The `body-align` command.
+    * The `title-align` command.
 
 === Changed
     * Updated documentation to be ordered more logically.

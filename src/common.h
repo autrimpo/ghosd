@@ -43,10 +43,12 @@ struct config {
     uint32_t size[2];
     struct timespec *timeout;
 
+    PangoAlignment bodyalign;
     char *defaultbodyfont;
     char *bodyfont;
     char *bodymsg;
 
+    PangoAlignment titlealign;
     char *defaulttitlefont;
     char *titlefont;
     char *titlemsg;

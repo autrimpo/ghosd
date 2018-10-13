@@ -47,3 +47,15 @@ linetostr(char *src, char **dest)
     strncpy(*dest, src, len);
     (*dest)[len - 1] = '\0';
 }
+
+void
+linetoalign(PangoAlignment *align, char *line)
+{
+    if (!strcmp(line, "left\n")) {
+        *align = PANGO_ALIGN_LEFT;
+    } else if (!strcmp(line, "right\n")) {
+        *align = PANGO_ALIGN_RIGHT;
+    } else if (!strcmp(line, "center\n")) {
+        *align = PANGO_ALIGN_CENTER;
+    }
+}

@@ -8,5 +8,6 @@ void draw_size(struct config *cfg);
 void draw_clear(struct config *cfg);
 void draw_bg(struct config *cfg);
 void draw_body(struct config *cfg);
+void draw_title(struct config *cfg);
 
 #endif

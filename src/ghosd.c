@@ -139,12 +139,14 @@ init_timer(timer_t *timer)
 void
 reset_config(struct config *cfg)
 {
+    linetoalign(&cfg->bodyalign, DEFAULT_BODY_ALIGN"\n");
     if (cfg->bodyfont != cfg->defaultbodyfont) {
         check_and_free(cfg->bodyfont);
         cfg->bodyfont = cfg->defaultbodyfont;
     }
     check_and_free(cfg->bodymsg);
 
+    linetoalign(&cfg->titlealign, DEFAULT_TITLE_ALIGN"\n");
     if (cfg->titlefont != cfg->defaulttitlefont) {
         check_and_free(cfg->titlefont);
         cfg->titlefont = cfg->defaulttitlefont;
@@ -293,9 +295,11 @@ main(int argc, char **argv)
 
     enum {
         INIT,
+        BODYALIGN,
         BODYFONT,
         BODYMSG,
         SHOW,
+        TITLEALIGN,
         TITLEFONT,
         TITLEMSG,
         WINDOWBG,
@@ -347,10 +351,14 @@ main(int argc, char **argv)
                 } else if (ISCMD("quit")) {
                     run = 0;
                     break;
+                } else if (ISCMD("body-align")) {
+                    state = BODYALIGN;
                 } else if (ISCMD("body-font")) {
                     state = BODYFONT;
                 } else if (ISCMD("body-msg")) {
                     state = BODYMSG;
+                } else if (ISCMD("title-align")) {
+                    state = TITLEALIGN;
                 } else if (ISCMD("title-font")) {
                     state = TITLEFONT;
                 } else if (ISCMD("title-msg")) {
@@ -367,6 +375,10 @@ main(int argc, char **argv)
                     state = WINDOWTIMEOUT;
                 }
                 break;
+            case BODYALIGN:
+                state = INIT;
+                linetoalign(&cfg.bodyalign, line);
+                break;
             case BODYFONT:
                 state = INIT;
                 if (cfg.bodyfont != cfg.defaultbodyfont) {
@@ -378,6 +390,10 @@ main(int argc, char **argv)
                 state = INIT;
                 check_and_free(cfg.bodymsg);
                 linetostr(line, &cfg.bodymsg);
+                break;
+            case TITLEALIGN:
+                state = INIT;
+                linetoalign(&cfg.titlealign, line);
                 break;
             case TITLEFONT:
                 state = INIT;

@@ -3,6 +3,10 @@
 
 == Argument types
 
+=== <align>
+Text alignment, one of 'left' 'right' or 'center'.
+Example: `center`
+
 === <color>
 An RGBA color represented as eight hexadecimal characters. +
 Example: `FFAA00FF`
@@ -47,6 +51,9 @@ Terminates *ghosd*.
 
 === Body
 
+==== body-align _<align>_
+Sets the alignment of the main body area.
+
 ==== body-font _<font>_
 Sets the font of the main body area.
 
@@ -54,6 +61,9 @@ Sets the font of the main body area.
 Sets the text of the main body area.
 
 === Title
+
+==== title-align _<align>_
+Sets the alignment of the title.
 
 ==== title-font _<font>_
 Sets the font of the title.
