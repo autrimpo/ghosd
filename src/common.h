@@ -37,7 +37,7 @@ struct config {
     struct itimerspec timer_int;
 
     /* ghosd */
-    struct color bg;
+    struct color windowcolor;
     int margin;
     uint32_t pos[2];
     uint32_t size[2];

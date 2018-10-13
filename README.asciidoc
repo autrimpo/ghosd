@@ -30,7 +30,7 @@ on a separate line.
 
 An example sequence, setting the background color and showing the osd window:
 
-    window-bg
+    window-color
     FF00AAFF
     show
 

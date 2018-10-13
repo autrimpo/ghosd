@@ -96,7 +96,7 @@ on the next line.
 
 ==== Window
 
-'window-bg <color>' ::
+'window-color <color>' ::
     Sets the color of the background.
 
 'window-margin <size>' ::

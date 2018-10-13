@@ -14,7 +14,7 @@
     }
 #define DEFAULT_TITLE_FONT "monospace 24"
 
-#define DEFAULT_WINDOW_BG                                                      \
+#define DEFAULT_WINDOW_COLOR                                                   \
     {                                                                          \
         0, 0, 0, 1                                                             \
     }

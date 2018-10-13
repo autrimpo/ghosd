@@ -139,23 +139,23 @@ init_timer(timer_t *timer)
 void
 reset_config(struct config *cfg)
 {
-    linetoalign(&cfg->bodyalign, DEFAULT_BODY_ALIGN"\n");
-    cfg->bodycolor               = (struct color)DEFAULT_BODY_COLOR;
+    linetoalign(&cfg->bodyalign, DEFAULT_BODY_ALIGN "\n");
+    cfg->bodycolor = (struct color)DEFAULT_BODY_COLOR;
     if (cfg->bodyfont != cfg->defaultbodyfont) {
         check_and_free(cfg->bodyfont);
         cfg->bodyfont = cfg->defaultbodyfont;
     }
     check_and_free(cfg->bodymsg);
 
-    linetoalign(&cfg->titlealign, DEFAULT_TITLE_ALIGN"\n");
-    cfg->titlecolor               = (struct color)DEFAULT_TITLE_COLOR;
+    linetoalign(&cfg->titlealign, DEFAULT_TITLE_ALIGN "\n");
+    cfg->titlecolor = (struct color)DEFAULT_TITLE_COLOR;
     if (cfg->titlefont != cfg->defaulttitlefont) {
         check_and_free(cfg->titlefont);
         cfg->titlefont = cfg->defaulttitlefont;
     }
     check_and_free(cfg->titlemsg);
 
-    cfg->bg               = (struct color)DEFAULT_WINDOW_BG;
+    cfg->windowcolor      = (struct color)DEFAULT_WINDOW_COLOR;
     cfg->margin           = DEFAULT_WINDOW_MARGIN;
     cfg->pos[0]           = DEFAULT_WINDOW_POS_X;
     cfg->pos[1]           = DEFAULT_WINDOW_POS_Y;
@@ -306,7 +306,7 @@ main(int argc, char **argv)
         TITLECOLOR,
         TITLEFONT,
         TITLEMSG,
-        WINDOWBG,
+        WINDOWCOLOR,
         WINDOWMARGIN,
         WINDOWPOS,
         WINDOWSIZE,
@@ -371,8 +371,8 @@ main(int argc, char **argv)
                     state = TITLEFONT;
                 } else if (ISCMD("title-msg")) {
                     state = TITLEMSG;
-                } else if (ISCMD("window-bg")) {
-                    state = WINDOWBG;
+                } else if (ISCMD("window-color")) {
+                    state = WINDOWCOLOR;
                 } else if (ISCMD("window-margin")) {
                     state = WINDOWMARGIN;
                 } else if (ISCMD("window-pos")) {
@@ -423,9 +423,9 @@ main(int argc, char **argv)
                 check_and_free(cfg.titlemsg);
                 linetostr(line, &cfg.titlemsg);
                 break;
-            case WINDOWBG:
+            case WINDOWCOLOR:
                 state = INIT;
-                hextorgba(line, &cfg.bg);
+                hextorgba(line, &cfg.windowcolor);
                 break;
             case WINDOWMARGIN:
                 state      = INIT;

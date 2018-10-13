@@ -79,7 +79,7 @@ Sets the text of the title.
 
 === Window
 
-==== window-bg _<color>_
+==== window-color _<color>_
 Sets the color of the background.
 
 ==== window-margin _<size>_

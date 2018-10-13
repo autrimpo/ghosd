@@ -13,6 +13,7 @@
 
 === Changed
     * Updated documentation to be ordered more logically.
+    * Renamed `window-bg` to `window-color` for consistency.
 
 == v0.1.0 - 2018-10-13
 === Added

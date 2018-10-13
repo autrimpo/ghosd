@@ -53,7 +53,7 @@ draw_clear(struct config *cfg)
 void
 draw_bg(struct config *cfg)
 {
-    struct color *clr = &cfg->bg;
+    struct color *clr = &cfg->windowcolor;
     cairo_set_source_rgba(cfg->cr, clr->r, clr->g, clr->b, clr->a);
     cairo_paint(cfg->cr);
 }
