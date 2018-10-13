@@ -28,12 +28,13 @@ requires an argument,
 the argument follows the command
 on the next line.
 
-== Commands reference
-
-=== Arguments
+== Command Arguments
 
 'align' ::
     Text alignment, one of 'left' 'right' or 'center'.
+
+'bodytype' ::
+    Type of content in the body area, one of 'text' or 'bar'.
 
 'color' ::
     RGBA color in hexadecimal format.
@@ -44,6 +45,9 @@ on the next line.
 'geometry' ::
     Two dimensions delimited by 'x'.
 
+'percentage' ::
+    Self explanatory.
+
 'size' ::
     Size in pixels.
 
@@ -53,9 +57,9 @@ on the next line.
 'time' ::
     Time duration, in miliseconds.
 
-=== Commands
+== Commands
 
-==== General
+=== General
 
 'show' ::
     Displays the *ghosd* window with the current configuration.
@@ -66,13 +70,31 @@ on the next line.
 'quit' ::
     Terminates *ghosd*.
 
-==== Body
+=== Body
 
-'body-align <align>' ::
-    Sets the alignment of the main body area.
+==== General
 
 'body-color <color>' ::
     Sets the color of the main body area.
+
+'body-type <bodytype>'
+    Sets what kind of content should be shown in the body area.
+
+==== Bar
+
+'body-bar-height <percentage>' ::
+    Sets the height of the bar, as a percentage of the body area.
+
+'body-bar-value <percentage>' ::
+    Sets how much of the bar should be filled, as a percentage of the whole.
+
+'body-bar-width <percentage>' ::
+    Sets the width of the bar, as a percentage of the body area.
+
+==== Text
+
+'body-align <align>' ::
+    Sets the alignment of the main body area.
 
 'body-font <font>' ::
     Sets the font of the main body area.
@@ -80,7 +102,7 @@ on the next line.
 'body-msg <string>' ::
     Sets the text of the main body area.
 
-==== Title
+=== Title
 
 'title-align <align>' ::
     Sets the alignment of the title.
@@ -94,7 +116,7 @@ on the next line.
 'title-msg <string>' ::
     Sets the text of the title.
 
-==== Window
+=== Window
 
 'window-color <color>' ::
     Sets the color of the background.

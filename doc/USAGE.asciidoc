@@ -7,6 +7,10 @@
 Text alignment, one of 'left' 'right' or 'center'.
 Example: `center`
 
+=== <bodytype>
+Type of content in the body area, one of 'text' or 'bar'.
+Example: `text`
+
 === <color>
 An RGBA color represented as eight hexadecimal characters. +
 Example: `FFAA00FF`
@@ -24,6 +28,10 @@ Ommiting either of the values is possible,
 in which case the omitted value remains unchanged. +
 Example: `230x` or `x510`
 
+==== <percentage>
+Self explanatory.
+Example: `45`
+
 === <size>
 Size in pixels.
 Example: `40`
@@ -40,57 +48,75 @@ Example: `2500`
 
 === General
 
-==== show
+===== show
 Displays the *ghosd* window with the current configuration.
 
-==== reset
+===== reset
 Resets the configuration to the default values.
 
-==== quit
+===== quit
 Terminates *ghosd*.
 
 === Body
 
-==== body-align _<align>_
-Sets the alignment of the main body area.
+==== General
 
-==== body-color _<color>_
+===== body-color _<color>_
 Sets the color of the main body area.
 
-==== body-font _<font>_
+===== body-type _<bodytype>_
+Sets what kind of content should be shown in the body area.
+
+==== Bar
+
+===== body-bar-height _<percentage>_
+Sets the height of the bar, as a percentage of the body area.
+
+===== body-bar-value _<percentage>_
+Sets how much of the bar should be filled, as a percentage of the whole.
+
+===== body-bar-width _<percentage>_
+Sets the width of the bar, as a percentage of the body area.
+
+==== Text
+
+===== body-align _<align>_
+Sets the alignment of the main body area.
+
+===== body-font _<font>_
 Sets the font of the main body area.
 
-==== body-msg _<string>_
+===== body-msg _<string>_
 Sets the text of the main body area.
 
 === Title
 
-==== title-align _<align>_
+===== title-align _<align>_
 Sets the alignment of the title.
 
-==== title-color _<color>_
+===== title-color _<color>_
 Sets the color of the title.
 
-==== title-font _<font>_
+===== title-font _<font>_
 Sets the font of the title.
 
-==== title-msg _<string>_
+===== title-msg _<string>_
 Sets the text of the title.
 
 === Window
 
-==== window-color _<color>_
+===== window-color _<color>_
 Sets the color of the background.
 
-==== window-margin _<size>_
+===== window-margin _<size>_
 Sets the margin of the window.
 
-==== window-pos _<geometry>_
+===== window-pos _<geometry>_
 Sets the position of the window on the screen, as an offset of the top left window
 corner from the top left screen corner.
 
-==== window-size _<geometry>_
+===== window-size _<geometry>_
 Sets the size of the window.
 
-==== window-timeout _<time>_
+===== window-timeout _<time>_
 Sets the duration after which the window will disappear.

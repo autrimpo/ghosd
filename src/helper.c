@@ -59,3 +59,13 @@ linetoalign(PangoAlignment *align, char *line)
         *align = PANGO_ALIGN_CENTER;
     }
 }
+
+void
+linetobodytype(char *line, enum bodytype *type)
+{
+    if (!strcmp(line, "text\n")) {
+        *type = TEXT;
+    } else if (!strcmp(line, "bar\n")) {
+        *type = BAR;
+    }
+}

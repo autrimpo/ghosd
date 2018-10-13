@@ -17,6 +17,11 @@ struct color {
     float a;
 };
 
+enum bodytype {
+    TEXT,
+    BAR,
+};
+
 struct config {
     /* xcb */
     xcb_ewmh_connection_t ewmh;
@@ -44,14 +49,20 @@ struct config {
     struct timespec *timeout;
 
     PangoAlignment bodyalign;
-    char *defaultbodyfont;
+    struct {
+        double height;
+        double val;
+        double width;
+    } bar;
     struct color bodycolor;
+    char *defaultbodyfont;
     char *bodyfont;
     char *bodymsg;
+    enum bodytype bodytype;
 
     PangoAlignment titlealign;
-    char *defaulttitlefont;
     struct color titlecolor;
+    char *defaulttitlefont;
     char *titlefont;
     char *titlemsg;
 };

@@ -140,12 +140,16 @@ void
 reset_config(struct config *cfg)
 {
     linetoalign(&cfg->bodyalign, DEFAULT_BODY_ALIGN "\n");
+    cfg->bar.val = DEFAULT_BODY_BAR_VALUE/100.0;
+    cfg->bar.width = DEFAULT_BODY_BAR_WIDTH/100.0;
+    cfg->bar.height = DEFAULT_BODY_BAR_HEIGHT/100.0;
     cfg->bodycolor = (struct color)DEFAULT_BODY_COLOR;
     if (cfg->bodyfont != cfg->defaultbodyfont) {
         check_and_free(cfg->bodyfont);
         cfg->bodyfont = cfg->defaultbodyfont;
     }
     check_and_free(cfg->bodymsg);
+    linetobodytype(DEFAULT_BODY_TYPE"\n", &cfg->bodytype);
 
     linetoalign(&cfg->titlealign, DEFAULT_TITLE_ALIGN "\n");
     cfg->titlecolor = (struct color)DEFAULT_TITLE_COLOR;
@@ -298,9 +302,13 @@ main(int argc, char **argv)
     enum {
         INIT,
         BODYALIGN,
+        BODYBARHEIGHT,
+        BODYBARVAL,
+        BODYBARWIDTH,
         BODYCOLOR,
         BODYFONT,
         BODYMSG,
+        BODYTYPE,
         SHOW,
         TITLEALIGN,
         TITLECOLOR,
@@ -357,12 +365,20 @@ main(int argc, char **argv)
                     break;
                 } else if (ISCMD("body-align")) {
                     state = BODYALIGN;
+                } else if (ISCMD("body-bar-height")) {
+                    state = BODYBARHEIGHT;
+                } else if (ISCMD("body-bar-value")) {
+                    state = BODYBARVAL;
+                } else if (ISCMD("body-bar-width")) {
+                    state = BODYBARWIDTH;
                 } else if (ISCMD("body-color")) {
                     state = BODYCOLOR;
                 } else if (ISCMD("body-font")) {
                     state = BODYFONT;
                 } else if (ISCMD("body-msg")) {
                     state = BODYMSG;
+                } else if (ISCMD("body-type")) {
+                    state = BODYTYPE;
                 } else if (ISCMD("title-align")) {
                     state = TITLEALIGN;
                 } else if (ISCMD("title-color")) {
@@ -387,6 +403,18 @@ main(int argc, char **argv)
                 state = INIT;
                 linetoalign(&cfg.bodyalign, line);
                 break;
+            case BODYBARHEIGHT:
+                state = INIT;
+                cfg.bar.height = atoi(line)/100;
+                break;
+            case BODYBARVAL:
+                state = INIT;
+                cfg.bar.val = atoi(line)/100;
+                break;
+            case BODYBARWIDTH:
+                state = INIT;
+                cfg.bar.width = atoi(line)/100;
+                break;
             case BODYCOLOR:
                 state = INIT;
                 hextorgba(line, &cfg.bodycolor);
@@ -402,6 +430,10 @@ main(int argc, char **argv)
                 state = INIT;
                 check_and_free(cfg.bodymsg);
                 linetostr(line, &cfg.bodymsg);
+                break;
+            case BODYTYPE:
+                state = INIT;
+                linetobodytype(line, &cfg.bodytype);
                 break;
             case TITLEALIGN:
                 state = INIT;

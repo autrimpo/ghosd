@@ -61,15 +61,6 @@ draw_bg(struct config *cfg)
 void
 draw_body(struct config *cfg)
 {
-    if (!cfg->bodymsg) {
-        return;
-    }
-    pango_layout_set_text(cfg->pl, cfg->bodymsg, -1);
-    PangoFontDescription *desc =
-        pango_font_description_from_string(cfg->bodyfont);
-    pango_layout_set_font_description(cfg->pl, desc);
-    pango_font_description_free(desc);
-
     int title_offset = 0;
     get_title_height(cfg, &title_offset);
     title_offset += title_offset ? cfg->margin * 0.5 : 0;
@@ -78,11 +69,36 @@ draw_body(struct config *cfg)
     cairo_set_source_rgba(cfg->cr, clr->r, clr->g, clr->b, clr->a);
 
     cairo_move_to(cfg->cr, cfg->margin, cfg->margin + title_offset);
-    pango_layout_set_width(cfg->pl,
-                           (cfg->size[0] - 2 * cfg->margin) * PANGO_SCALE);
-    pango_layout_set_alignment(cfg->pl, cfg->bodyalign);
-    pango_cairo_update_layout(cfg->cr, cfg->pl);
-    pango_cairo_show_layout(cfg->cr, cfg->pl);
+
+    switch (cfg->bodytype) {
+    case TEXT:
+        if (!cfg->bodymsg) {
+            return;
+        }
+        pango_layout_set_text(cfg->pl, cfg->bodymsg, -1);
+        PangoFontDescription *desc =
+            pango_font_description_from_string(cfg->bodyfont);
+        pango_layout_set_font_description(cfg->pl, desc);
+        pango_font_description_free(desc);
+        pango_layout_set_width(cfg->pl,
+                               (cfg->size[0] - 2 * cfg->margin) * PANGO_SCALE);
+        pango_layout_set_alignment(cfg->pl, cfg->bodyalign);
+        pango_cairo_update_layout(cfg->cr, cfg->pl);
+        pango_cairo_show_layout(cfg->cr, cfg->pl);
+        break;
+    case BAR: {
+        int width = (cfg->size[0] - 2 * cfg->margin) * cfg->bar.width;
+        int height =
+            (cfg->size[1] - title_offset - 2 * cfg->margin) * cfg->bar.height;
+        int x = (cfg->size[0] - width) / 2;
+        int y = (cfg->margin + title_offset +
+                 (cfg->size[1] - 2 * cfg->margin - title_offset - height) / 2);
+        cairo_rectangle(cfg->cr, x, y, width, height);
+        cairo_stroke(cfg->cr);
+        cairo_rectangle(cfg->cr, x, y, (width)*cfg->bar.val, height);
+        cairo_fill(cfg->cr);
+    } break;
+    }
 }
 
 void

@@ -37,8 +37,7 @@ ghosd \- a simple, dynamic osd
 \fBghosd\fR is an on screen display that reads contents from a named pipe and displays it for a configured time period\&.
 .sp
 It reads a series of commands, each on a separate line\&. If the command requires an argument, the argument follows the command on the next line\&.
-.SH "COMMANDS REFERENCE"
-.SS "Arguments"
+.SH "COMMAND ARGUMENTS"
 .PP
 \fIalign\fR
 .RS 4
@@ -47,6 +46,14 @@ Text alignment, one of
 \fIright\fR
 or
 \fIcenter\fR\&.
+.RE
+.PP
+\fIbodytype\fR
+.RS 4
+Type of content in the body area, one of
+\fItext\fR
+or
+\fIbar\fR\&.
 .RE
 .PP
 \fIcolor\fR
@@ -66,6 +73,11 @@ Two dimensions delimited by
 \fIx\fR\&.
 .RE
 .PP
+\fIpercentage\fR
+.RS 4
+Self explanatory\&.
+.RE
+.PP
 \fIsize\fR
 .RS 4
 Size in pixels\&.
@@ -81,15 +93,8 @@ Line of UTF\-8 encoded text\&. Can\(cqt contain the newline character
 .RS 4
 Time duration, in miliseconds\&.
 .RE
-.SS "Commands"
-.sp
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBGeneral\fR
-.RS 4
+.SH "COMMANDS"
+.SS "General"
 .PP
 \fIshow\fR
 .RS 4
@@ -108,6 +113,22 @@ Resets the configuration to the default values\&.
 Terminates
 \fBghosd\fR\&.
 .RE
+.SS "Body"
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBGeneral\fR
+.RS 4
+.PP
+\fIbody\-color <color>\fR
+.RS 4
+Sets the color of the main body area\&.
+.RE
+.sp
+\fIbody\-type <bodytype>\fR Sets what kind of content should be shown in the body area\&.
 .RE
 .sp
 .it 1 an-trap
@@ -115,17 +136,36 @@ Terminates
 .nr an-break-flag 1
 .br
 .ps +1
-\fBBody\fR
+\fBBar\fR
+.RS 4
+.PP
+\fIbody\-bar\-height <percentage>\fR
+.RS 4
+Sets the height of the bar, as a percentage of the body area\&.
+.RE
+.PP
+\fIbody\-bar\-value <percentage>\fR
+.RS 4
+Sets how much of the bar should be filled, as a percentage of the whole\&.
+.RE
+.PP
+\fIbody\-bar\-width <percentage>\fR
+.RS 4
+Sets the width of the bar, as a percentage of the body area\&.
+.RE
+.RE
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBText\fR
 .RS 4
 .PP
 \fIbody\-align <align>\fR
 .RS 4
 Sets the alignment of the main body area\&.
-.RE
-.PP
-\fIbody\-color <color>\fR
-.RS 4
-Sets the color of the main body area\&.
 .RE
 .PP
 \fIbody\-font <font>\fR
@@ -138,14 +178,7 @@ Sets the font of the main body area\&.
 Sets the text of the main body area\&.
 .RE
 .RE
-.sp
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBTitle\fR
-.RS 4
+.SS "Title"
 .PP
 \fItitle\-align <align>\fR
 .RS 4
@@ -166,15 +199,7 @@ Sets the font of the title\&.
 .RS 4
 Sets the text of the title\&.
 .RE
-.RE
-.sp
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBWindow\fR
-.RS 4
+.SS "Window"
 .PP
 \fIwindow\-color <color>\fR
 .RS 4
@@ -199,7 +224,6 @@ Sets the size of the window\&.
 \fIwindow\-timeout <time>\fR
 .RS 4
 Sets the duration after which the window will disappear\&.
-.RE
 .RE
 .SH "ENVIRONMENT VARIABLES"
 .PP
