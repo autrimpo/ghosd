@@ -1,0 +1,14 @@
+= Changelog
+
+== v0.1.0 - 2018-10-13
+=== Added
+    * `show` command
+    * `reset` command
+    * `quit` command
+    * `window-timeout` command
+    * `window-bg` command
+    * `window-size` command
+    * `window-pos` command
+    * `window-margin` command
+    * `body-msg` command
+    * `body-font` command
