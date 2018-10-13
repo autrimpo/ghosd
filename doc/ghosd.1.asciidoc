@@ -93,13 +93,13 @@ on the next line.
 
 ==== Text
 
-'body-align <align>' ::
-    Sets the alignment of the main body area.
+'body-text-align <align>' ::
+    Sets the alignment of the text in the main body area.
 
-'body-font <font>' ::
-    Sets the font of the main body area.
+'body-text-font <font>' ::
+    Sets the font of the text in the main body area.
 
-'body-msg <string>' ::
+'body-text-value <string>' ::
     Sets the text of the main body area.
 
 === Title
@@ -113,7 +113,7 @@ on the next line.
 'title-font <font>' ::
     Sets the font of the title.
 
-'title-msg <string>' ::
+'title-value <string>' ::
     Sets the text of the title.
 
 === Window
@@ -124,7 +124,7 @@ on the next line.
 'window-margin <size>' ::
     Sets the margin of the window.
 
-'window-pos <geometry>' ::
+'window-position <geometry>' ::
     Sets the position of the window on the screen,
     as an offset of the top left window corner from the top left screen corner.
 

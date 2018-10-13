@@ -4,16 +4,24 @@
 == v0.2.0 [unreleased]
 === Added
     * A table of contents to changelog.
-    * The `title-font` command.
-    * The `title-msg` command.
     * The `body-align` command.
-    * The `title-align` command.
+    * The `body-bar-height` command.
+    * The `body-bar-value` command.
+    * The `body-bar-width` command.
     * The `body-color` command.
+    * The `body-type` command.
+    * The `title-align` command.
     * The `title-color` command.
+    * The `title-font` command.
+    * The `title-value` command.
 
 === Changed
     * Updated documentation to be ordered more logically.
+    * Renamed `body-align` to `body-text-align` for consistency.
+    * Renamed `body-font` to `body-text-font` for consistency.
+    * Renamed `body-msg` to `body-text-value` for consistency.
     * Renamed `window-bg` to `window-color` for consistency.
+    * Renamed `window-pos` to `window-position` for consistency.
 
 == v0.1.0 - 2018-10-13
 === Added

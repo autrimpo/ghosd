@@ -139,17 +139,17 @@ init_timer(timer_t *timer)
 void
 reset_config(struct config *cfg)
 {
-    linetoalign(&cfg->bodyalign, DEFAULT_BODY_ALIGN "\n");
-    cfg->bar.val = DEFAULT_BODY_BAR_VALUE/100.0;
-    cfg->bar.width = DEFAULT_BODY_BAR_WIDTH/100.0;
-    cfg->bar.height = DEFAULT_BODY_BAR_HEIGHT/100.0;
-    cfg->bodycolor = (struct color)DEFAULT_BODY_COLOR;
+    cfg->bodycolor  = (struct color)DEFAULT_BODY_COLOR;
+    linetobodytype(DEFAULT_BODY_TYPE "\n", &cfg->bodytype);
+    cfg->bar.val    = DEFAULT_BODY_BAR_VALUE / 100.0;
+    cfg->bar.width  = DEFAULT_BODY_BAR_WIDTH / 100.0;
+    cfg->bar.height = DEFAULT_BODY_BAR_HEIGHT / 100.0;
+    linetoalign(&cfg->bodyalign, DEFAULT_BODY_TEXT_ALIGN "\n");
     if (cfg->bodyfont != cfg->defaultbodyfont) {
         check_and_free(cfg->bodyfont);
         cfg->bodyfont = cfg->defaultbodyfont;
     }
     check_and_free(cfg->bodymsg);
-    linetobodytype(DEFAULT_BODY_TYPE"\n", &cfg->bodytype);
 
     linetoalign(&cfg->titlealign, DEFAULT_TITLE_ALIGN "\n");
     cfg->titlecolor = (struct color)DEFAULT_TITLE_COLOR;
@@ -161,8 +161,8 @@ reset_config(struct config *cfg)
 
     cfg->windowcolor      = (struct color)DEFAULT_WINDOW_COLOR;
     cfg->margin           = DEFAULT_WINDOW_MARGIN;
-    cfg->pos[0]           = DEFAULT_WINDOW_POS_X;
-    cfg->pos[1]           = DEFAULT_WINDOW_POS_Y;
+    cfg->pos[0]           = DEFAULT_WINDOW_POSITION_X;
+    cfg->pos[1]           = DEFAULT_WINDOW_POSITION_Y;
     cfg->size[0]          = DEFAULT_WINDOW_SIZE_X;
     cfg->size[1]          = DEFAULT_WINDOW_SIZE_Y;
     cfg->timeout->tv_sec  = S_GET_S(DEFAULT_WINDOW_TIMEOUT);
@@ -178,7 +178,7 @@ init_config(struct config *cfg)
 
     cfg->bodymsg         = NULL;
     cfg->bodyfont        = NULL;
-    cfg->defaultbodyfont = DEFAULT_BODY_FONT;
+    cfg->defaultbodyfont = DEFAULT_BODY_TEXT_FONT;
 
     cfg->titlemsg         = NULL;
     cfg->titlefont        = NULL;
@@ -301,19 +301,19 @@ main(int argc, char **argv)
 
     enum {
         INIT,
-        BODYALIGN,
+        BODYTEXTALIGN,
         BODYBARHEIGHT,
         BODYBARVAL,
         BODYBARWIDTH,
         BODYCOLOR,
-        BODYFONT,
-        BODYMSG,
+        BODYTEXTFONT,
+        BODYTEXTVAL,
         BODYTYPE,
         SHOW,
         TITLEALIGN,
         TITLECOLOR,
         TITLEFONT,
-        TITLEMSG,
+        TITLEVAL,
         WINDOWCOLOR,
         WINDOWMARGIN,
         WINDOWPOS,
@@ -363,35 +363,35 @@ main(int argc, char **argv)
                 } else if (ISCMD("quit")) {
                     run = 0;
                     break;
-                } else if (ISCMD("body-align")) {
-                    state = BODYALIGN;
+                } else if (ISCMD("body-color")) {
+                    state = BODYCOLOR;
+                } else if (ISCMD("body-type")) {
+                    state = BODYTYPE;
                 } else if (ISCMD("body-bar-height")) {
                     state = BODYBARHEIGHT;
                 } else if (ISCMD("body-bar-value")) {
                     state = BODYBARVAL;
                 } else if (ISCMD("body-bar-width")) {
                     state = BODYBARWIDTH;
-                } else if (ISCMD("body-color")) {
-                    state = BODYCOLOR;
-                } else if (ISCMD("body-font")) {
-                    state = BODYFONT;
-                } else if (ISCMD("body-msg")) {
-                    state = BODYMSG;
-                } else if (ISCMD("body-type")) {
-                    state = BODYTYPE;
+                } else if (ISCMD("body-text-align")) {
+                    state = BODYTEXTALIGN;
+                } else if (ISCMD("body-text-font")) {
+                    state = BODYTEXTFONT;
+                } else if (ISCMD("body-text-value")) {
+                    state = BODYTEXTVAL;
                 } else if (ISCMD("title-align")) {
                     state = TITLEALIGN;
                 } else if (ISCMD("title-color")) {
                     state = TITLECOLOR;
                 } else if (ISCMD("title-font")) {
                     state = TITLEFONT;
-                } else if (ISCMD("title-msg")) {
-                    state = TITLEMSG;
+                } else if (ISCMD("title-value")) {
+                    state = TITLEVAL;
                 } else if (ISCMD("window-color")) {
                     state = WINDOWCOLOR;
                 } else if (ISCMD("window-margin")) {
                     state = WINDOWMARGIN;
-                } else if (ISCMD("window-pos")) {
+                } else if (ISCMD("window-position")) {
                     state = WINDOWPOS;
                 } else if (ISCMD("window-size")) {
                     state = WINDOWSIZE;
@@ -399,34 +399,34 @@ main(int argc, char **argv)
                     state = WINDOWTIMEOUT;
                 }
                 break;
-            case BODYALIGN:
+            case BODYTEXTALIGN:
                 state = INIT;
                 linetoalign(&cfg.bodyalign, line);
                 break;
             case BODYBARHEIGHT:
-                state = INIT;
-                cfg.bar.height = atoi(line)/100;
+                state          = INIT;
+                cfg.bar.height = atoi(line) / 100;
                 break;
             case BODYBARVAL:
-                state = INIT;
-                cfg.bar.val = atoi(line)/100;
+                state       = INIT;
+                cfg.bar.val = atoi(line) / 100;
                 break;
             case BODYBARWIDTH:
-                state = INIT;
-                cfg.bar.width = atoi(line)/100;
+                state         = INIT;
+                cfg.bar.width = atoi(line) / 100;
                 break;
             case BODYCOLOR:
                 state = INIT;
                 hextorgba(line, &cfg.bodycolor);
                 break;
-            case BODYFONT:
+            case BODYTEXTFONT:
                 state = INIT;
                 if (cfg.bodyfont != cfg.defaultbodyfont) {
                     free(cfg.bodyfont);
                 }
                 linetostr(line, &cfg.bodyfont);
                 break;
-            case BODYMSG:
+            case BODYTEXTVAL:
                 state = INIT;
                 check_and_free(cfg.bodymsg);
                 linetostr(line, &cfg.bodymsg);
@@ -450,7 +450,7 @@ main(int argc, char **argv)
                 }
                 linetostr(line, &cfg.titlefont);
                 break;
-            case TITLEMSG:
+            case TITLEVAL:
                 state = INIT;
                 check_and_free(cfg.titlemsg);
                 linetostr(line, &cfg.titlemsg);
