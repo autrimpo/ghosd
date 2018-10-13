@@ -1,0 +1,128 @@
+'\" t
+.\"     Title: ghosd
+.\"    Author: [see the "Author" section]
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 10/13/2018
+.\"    Manual: Ghosd Manual
+.\"    Source: Ghosd 0.1.0
+.\"  Language: English
+.\"
+.TH "GHOSD" "1" "10/13/2018" "Ghosd 0\&.1\&.0" "Ghosd Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ghosd \- a simple, dynamic osd
+.SH "SYNOPSIS"
+.sp
+\fBghosd\fR [\fB\-h\fR|\fB\-v\fR]
+.SH "DESCRIPTION"
+.sp
+\fBghosd\fR is an on screen display that reads contents from a named pipe and displays it for a configured time period\&.
+.sp
+It reads a series of commands, each on a separate line\&. If the command requires an argument, the argument follows the command on the next line\&.
+.SH "COMMANDS REFERENCE"
+.SS "Arguments"
+.PP
+\fIsize\fR
+.RS 4
+Size in pixels\&.
+.RE
+.PP
+\fItime\fR
+.RS 4
+Time duration, in miliseconds\&.
+.RE
+.PP
+\fIcolor\fR
+.RS 4
+RGBA color in hexadecimal format\&.
+.RE
+.PP
+\fIgeometry\fR
+.RS 4
+Two dimensions delimited by
+\fIx\fR\&.
+.RE
+.PP
+\fIstring\fR
+.RS 4
+Line of UTF\-8 encoded text\&. Can\(cqt contain the newline character
+\fI\en\fR\&.
+.RE
+.SS "Commands"
+.PP
+\fIshow\fR
+.RS 4
+Displays the
+\fBghosd\fR
+window with the current configuration\&.
+.RE
+.PP
+\fIreset\fR
+.RS 4
+Resets the configuration to the default values\&.
+.RE
+.PP
+\fIquit\fR
+.RS 4
+Terminates
+\fBghosd\fR\&.
+.RE
+.PP
+\fIwindow\-timeout <time>\fR
+.RS 4
+Sets the duration after which the window will disappear\&.
+.RE
+.PP
+\fIwindow\-bg <color>\fR
+.RS 4
+Sets the color of the background\&.
+.RE
+.PP
+\fIwindow\-pos <geometry>\fR
+.RS 4
+Sets the position of the window on the screen, as an offset of the top left window corner from the top left screen corner\&.
+.RE
+.PP
+\fIwindow\-size <geometry>\fR
+.RS 4
+Sets the size of the window\&.
+.RE
+.PP
+\fIwindow\-margin <size>\fR
+.RS 4
+Sets the margin of the window\&.
+.RE
+.PP
+\fIbody\-msg <string>\fR
+.RS 4
+Sets the text of the main body area\&.
+.RE
+.SH "ENVIRONMENT VARIABLES"
+.PP
+\fIGHOSD_FIFO\fR
+.RS 4
+The path of the named pipe used for communication\&. If it isn\(cqt defined,
+\fI/tmp/ghosd\-fifo\fR
+is used as default\&.
+.RE
+.SH "AUTHOR"
+.sp
+Michal Koutenský <koutak\&.m at gmail\&.com>

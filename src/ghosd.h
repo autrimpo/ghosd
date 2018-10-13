@@ -16,7 +16,7 @@
 #define ISCMD(CMD)                                                             \
     (ret == strlen(CMD "\n") && !strncmp(line, CMD "\n", strlen(CMD "\n")))
 
-#define VERSION "0.1"
+/* #define VERSION "0.1" */
 
 void setup_sighandler();
 void draw(struct config *cfg);

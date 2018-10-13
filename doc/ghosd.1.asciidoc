@@ -1,0 +1,88 @@
+:man source: Ghosd
+:man version: {revnumber}
+:man manual: Ghosd Manual
+
+= ghosd(1)
+
+== Name
+
+ghosd - a simple, dynamic osd
+
+== Synopsis
+
+*ghosd* [*-h*|*-v*]
+
+== Description
+
+*ghosd* is an on screen display that
+reads contents from
+a named pipe
+and displays it
+for a configured time period.
+
+It reads
+a series of commands,
+each on a separate line.
+If the command
+requires an argument,
+the argument follows the command
+on the next line.
+
+== Commands reference
+
+=== Arguments
+'size' ::
+    Size in pixels.
+
+'time' ::
+    Time duration, in miliseconds.
+
+'color' ::
+    RGBA color in hexadecimal format.
+
+'geometry' ::
+    Two dimensions delimited by 'x'.
+
+'string' ::
+    Line of UTF-8 encoded text. Can't contain the newline character '\n'.
+
+=== Commands
+
+'show' ::
+    Displays the *ghosd* window with the current configuration.
+
+'reset' ::
+    Resets the configuration to the default values.
+
+'quit' ::
+    Terminates *ghosd*.
+
+'window-timeout <time>' ::
+    Sets the duration after which the window will disappear.
+
+'window-bg <color>' ::
+    Sets the color of the background.
+
+'window-pos <geometry>' ::
+    Sets the position of the window on the screen,
+    as an offset of the top left window corner from the top left screen corner.
+
+'window-size <geometry>' ::
+    Sets the size of the window.
+
+'window-margin <size>' ::
+    Sets the margin of the window.
+
+'body-msg <string>' ::
+    Sets the text of the main body area.
+
+== Environment Variables
+
+'GHOSD_FIFO' ::
+    The path of the named pipe used for communication. If it isn't defined,
+    '/tmp/ghosd-fifo'
+    is used as default.
+
+== Author
+
+Michal Koutenský <koutak.m at gmail.com>
