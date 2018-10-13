@@ -31,25 +31,28 @@ on the next line.
 == Commands reference
 
 === Arguments
-'size' ::
-    Size in pixels.
-
-'time' ::
-    Time duration, in miliseconds.
 
 'color' ::
     RGBA color in hexadecimal format.
 
+'font' ::
+    Pango font description specified as '[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]'.
+
 'geometry' ::
     Two dimensions delimited by 'x'.
+
+'size' ::
+    Size in pixels.
 
 'string' ::
     Line of UTF-8 encoded text. Can't contain the newline character '\n'.
 
-'font' ::
-    Pango font description specified as '[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]'.
+'time' ::
+    Time duration, in miliseconds.
 
 === Commands
+
+==== General
 
 'show' ::
     Displays the *ghosd* window with the current configuration.
@@ -60,11 +63,21 @@ on the next line.
 'quit' ::
     Terminates *ghosd*.
 
-'window-timeout <time>' ::
-    Sets the duration after which the window will disappear.
+==== Body
+
+'body-font <font>' ::
+    Sets the font of the main body area.
+
+'body-msg <string>' ::
+    Sets the text of the main body area.
+
+==== Window
 
 'window-bg <color>' ::
     Sets the color of the background.
+
+'window-margin <size>' ::
+    Sets the margin of the window.
 
 'window-pos <geometry>' ::
     Sets the position of the window on the screen,
@@ -73,14 +86,8 @@ on the next line.
 'window-size <geometry>' ::
     Sets the size of the window.
 
-'window-margin <size>' ::
-    Sets the margin of the window.
-
-'body-msg <string>' ::
-    Sets the text of the main body area.
-
-'body-font <font>' ::
-    Sets the font of the main body area.
+'window-timeout <time>' ::
+    Sets the duration after which the window will disappear.
 
 == Environment Variables
 

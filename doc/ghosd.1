@@ -40,19 +40,15 @@ It reads a series of commands, each on a separate line\&. If the command require
 .SH "COMMANDS REFERENCE"
 .SS "Arguments"
 .PP
-\fIsize\fR
-.RS 4
-Size in pixels\&.
-.RE
-.PP
-\fItime\fR
-.RS 4
-Time duration, in miliseconds\&.
-.RE
-.PP
 \fIcolor\fR
 .RS 4
 RGBA color in hexadecimal format\&.
+.RE
+.PP
+\fIfont\fR
+.RS 4
+Pango font description specified as
+\fI[FAMILY\-LIST] [STYLE\-OPTIONS] [SIZE]\fR\&.
 .RE
 .PP
 \fIgeometry\fR
@@ -61,18 +57,30 @@ Two dimensions delimited by
 \fIx\fR\&.
 .RE
 .PP
+\fIsize\fR
+.RS 4
+Size in pixels\&.
+.RE
+.PP
 \fIstring\fR
 .RS 4
 Line of UTF\-8 encoded text\&. Can\(cqt contain the newline character
 \fI\en\fR\&.
 .RE
 .PP
-\fIfont\fR
+\fItime\fR
 .RS 4
-Pango font description specified as
-\fI[FAMILY\-LIST] [STYLE\-OPTIONS] [SIZE]\fR\&.
+Time duration, in miliseconds\&.
 .RE
 .SS "Commands"
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBGeneral\fR
+.RS 4
 .PP
 \fIshow\fR
 .RS 4
@@ -91,15 +99,43 @@ Resets the configuration to the default values\&.
 Terminates
 \fBghosd\fR\&.
 .RE
-.PP
-\fIwindow\-timeout <time>\fR
-.RS 4
-Sets the duration after which the window will disappear\&.
 .RE
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBBody\fR
+.RS 4
+.PP
+\fIbody\-font <font>\fR
+.RS 4
+Sets the font of the main body area\&.
+.RE
+.PP
+\fIbody\-msg <string>\fR
+.RS 4
+Sets the text of the main body area\&.
+.RE
+.RE
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBWindow\fR
+.RS 4
 .PP
 \fIwindow\-bg <color>\fR
 .RS 4
 Sets the color of the background\&.
+.RE
+.PP
+\fIwindow\-margin <size>\fR
+.RS 4
+Sets the margin of the window\&.
 .RE
 .PP
 \fIwindow\-pos <geometry>\fR
@@ -112,19 +148,10 @@ Sets the position of the window on the screen, as an offset of the top left wind
 Sets the size of the window\&.
 .RE
 .PP
-\fIwindow\-margin <size>\fR
+\fIwindow\-timeout <time>\fR
 .RS 4
-Sets the margin of the window\&.
+Sets the duration after which the window will disappear\&.
 .RE
-.PP
-\fIbody\-msg <string>\fR
-.RS 4
-Sets the text of the main body area\&.
-.RE
-.PP
-\fIbody\-font <font>\fR
-.RS 4
-Sets the font of the main body area\&.
 .RE
 .SH "ENVIRONMENT VARIABLES"
 .PP

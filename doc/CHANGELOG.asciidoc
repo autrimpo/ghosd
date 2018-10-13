@@ -1,4 +1,12 @@
 = Changelog
+:toc:
+
+== v0.2.0 [unreleased]
+=== Added
+    * A table of contents to changelog.
+
+=== Changed
+    * Updated documentation to be ordered more logically.
 
 == v0.1.0 - 2018-10-13
 === Added

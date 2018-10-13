@@ -283,14 +283,14 @@ main(int argc, char **argv)
 
     enum {
         INIT,
-        SHOW,
-        BG,
-        TIMEOUT,
-        WINDOWSIZE,
-        WINDOWPOS,
-        MARGIN,
-        BODYMSG,
         BODYFONT,
+        BODYMSG,
+        SHOW,
+        WINDOWBG,
+        WINDOWMARGIN,
+        WINDOWPOS,
+        WINDOWSIZE,
+        WINDOWTIMEOUT,
     } state;
 
     state = INIT;
@@ -331,15 +331,15 @@ main(int argc, char **argv)
                     draw(&cfg);
                     timer_settime(cfg.timer, 0, &cfg.timer_int, NULL);
                 } else if (ISCMD("window-bg")) {
-                    state = BG;
+                    state = WINDOWBG;
                 } else if (ISCMD("window-timeout")) {
-                    state = TIMEOUT;
+                    state = WINDOWTIMEOUT;
                 } else if (ISCMD("window-size")) {
                     state = WINDOWSIZE;
                 } else if (ISCMD("window-pos")) {
                     state = WINDOWPOS;
                 } else if (ISCMD("window-margin")) {
-                    state = MARGIN;
+                    state = WINDOWMARGIN;
                 } else if (ISCMD("body-msg")) {
                     state = BODYMSG;
                 } else if (ISCMD("body-font")) {
@@ -352,31 +352,6 @@ main(int argc, char **argv)
                     break;
                 }
                 break;
-            case BG:
-                state = INIT;
-                hextorgba(line, &cfg.bg);
-                break;
-            case TIMEOUT:
-                state                = INIT;
-                cfg.timeout->tv_sec  = S_GET_S(atoi(line));
-                cfg.timeout->tv_nsec = S_GET_NS(atoi(line));
-                break;
-            case WINDOWSIZE:
-                state = INIT;
-                geomtovec(line, cfg.size);
-                break;
-            case WINDOWPOS:
-                state = INIT;
-                geomtovec(line, cfg.pos);
-                break;
-            case BODYMSG:
-                state = INIT;
-                check_and_free(cfg.bodymsg);
-                len         = strlen(line);
-                cfg.bodymsg = malloc(len);
-                strncpy(cfg.bodymsg, line, len);
-                cfg.bodymsg[len - 1] = '\0';
-                break;
             case BODYFONT:
                 state = INIT;
                 if (cfg.bodyfont != cfg.defaultbodyfont) {
@@ -387,9 +362,34 @@ main(int argc, char **argv)
                 strncpy(cfg.bodyfont, line, len);
                 cfg.bodyfont[len - 1] = '\0';
                 break;
-            case MARGIN:
+            case BODYMSG:
+                state = INIT;
+                check_and_free(cfg.bodymsg);
+                len         = strlen(line);
+                cfg.bodymsg = malloc(len);
+                strncpy(cfg.bodymsg, line, len);
+                cfg.bodymsg[len - 1] = '\0';
+                break;
+            case WINDOWBG:
+                state = INIT;
+                hextorgba(line, &cfg.bg);
+                break;
+            case WINDOWMARGIN:
                 state      = INIT;
                 cfg.margin = atoi(line);
+                break;
+            case WINDOWPOS:
+                state = INIT;
+                geomtovec(line, cfg.pos);
+                break;
+            case WINDOWSIZE:
+                state = INIT;
+                geomtovec(line, cfg.size);
+                break;
+            case WINDOWTIMEOUT:
+                state                = INIT;
+                cfg.timeout->tv_sec  = S_GET_S(atoi(line));
+                cfg.timeout->tv_nsec = S_GET_NS(atoi(line));
                 break;
             default:
                 break;

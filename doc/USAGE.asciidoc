@@ -3,17 +3,13 @@
 
 == Argument types
 
-=== <size>
-Size in pixels.
-Example: `40`
-
-=== <time>
-A time duration, in miliseconds.
-Example: `2500`
-
 === <color>
 An RGBA color represented as eight hexadecimal characters. +
 Example: `FFAA00FF`
+
+=== <font>
+Pango font description specified as '[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]'. +
+Example: `serif,monospace bold italic condensed 16`
 
 === <geometry>
 Two integers delimited by `x`
@@ -24,43 +20,53 @@ Ommiting either of the values is possible,
 in which case the omitted value remains unchanged. +
 Example: `230x` or `x510`
 
+=== <size>
+Size in pixels.
+Example: `40`
+
 === <string>
 A line of UTF-8 encoded text. Can't contain the newline character `\n`. +
 Example: `Hello, world!`
 
-=== <font>
-Pango font description specified as '[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]'. +
-Example: `serif,monospace bold italic condensed 16`
+=== <time>
+A time duration, in miliseconds.
+Example: `2500`
 
 == Commands
 
-=== show
+=== General
+
+==== show
 Displays the *ghosd* window with the current configuration.
 
-=== reset
+==== reset
 Resets the configuration to the default values.
 
-=== quit
+==== quit
 Terminates *ghosd*.
 
-=== window-timeout _<time>_
-Sets the duration after which the window will disappear.
+=== Body
 
-=== window-bg _<color>_
+==== body-font _<font>_
+Sets the font of the main body area.
+
+==== body-msg _<string>_
+Sets the text of the main body area.
+
+=== Window
+
+==== window-bg _<color>_
 Sets the color of the background.
 
-=== window-pos _<geometry>_
+==== window-margin _<size>_
+Sets the margin of the window.
+
+==== window-pos _<geometry>_
 Sets the position of the window on the screen, as an offset of the top left window
 corner from the top left screen corner.
 
-=== window-size _<geometry>_
+==== window-size _<geometry>_
 Sets the size of the window.
 
-=== window-margin _<size>_
-Sets the margin of the window.
-
-=== body-msg _<string>_
-Sets the text of the main body area.
-
-=== body-msg _<font>_
-Sets the font of the main body area.
+==== window-timeout _<time>_
+Sets the duration after which the window will disappear.
