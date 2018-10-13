@@ -22,11 +22,15 @@ in pixels. +
 Example: `230x510` +
 Ommiting either of the values is possible,
 in which case the omitted value remains unchanged. +
-Example: `230x` or `x510`.
+Example: `230x` or `x510`
 
 === <string>
 A line of UTF-8 encoded text. Can't contain the newline character `\n`. +
 Example: `Hello, world!`
+
+=== <font>
+Pango font description specified as '[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]'. +
+Example: `serif,monospace bold italic condensed 16`
 
 == Commands
 
@@ -57,3 +61,6 @@ Sets the margin of the window.
 
 === body-msg _<string>_
 Sets the text of the main body area.
+
+=== body-msg _<font>_
+Sets the font of the main body area.

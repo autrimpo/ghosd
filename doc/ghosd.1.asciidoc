@@ -46,6 +46,9 @@ on the next line.
 'string' ::
     Line of UTF-8 encoded text. Can't contain the newline character '\n'.
 
+'font' ::
+    Pango font description specified as '[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]'.
+
 === Commands
 
 'show' ::
@@ -75,6 +78,9 @@ on the next line.
 
 'body-msg <string>' ::
     Sets the text of the main body area.
+
+'body-font <font>' ::
+    Sets the font of the main body area.
 
 == Environment Variables
 
