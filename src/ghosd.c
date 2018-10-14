@@ -46,6 +46,42 @@ setup_sighandler()
 }
 
 void
+sync_configs(struct config *main, struct config *draw)
+{
+    check_and_free(draw->bodymsg);
+    if (draw->bodyfont != draw->defaultbodyfont) {
+        free(draw->bodyfont);
+    }
+
+    check_and_free(draw->titlemsg);
+    if (draw->titlefont != draw->defaulttitlefont) {
+        free(draw->titlefont);
+    }
+
+    memcpy(draw, main, sizeof(struct config));
+
+    if (main->bodymsg) {
+        draw->bodymsg = malloc(strlen(main->bodymsg));
+        strcpy(draw->bodymsg, main->bodymsg);
+    }
+
+    if (main->bodyfont != main->defaultbodyfont) {
+        draw->bodyfont = malloc(strlen(main->bodyfont));
+        strcpy(draw->bodyfont, main->bodyfont);
+    }
+
+    if (main->titlemsg) {
+        draw->titlemsg = malloc(strlen(main->titlemsg));
+        strcpy(draw->titlemsg, main->titlemsg);
+    }
+
+    if (main->titlefont != main->defaulttitlefont) {
+        draw->titlefont = malloc(strlen(main->titlefont));
+        strcpy(draw->titlefont, main->titlefont);
+    }
+}
+
+void
 draw(struct config *cfg)
 {
     draw_pos(cfg);
@@ -279,10 +315,19 @@ main(int argc, char **argv)
     mkfifo(fifo_path, 0644);
 
     struct config cfg;
+    struct config draw_cfg;
 
     if (init(&cfg)) {
         return -1;
     }
+
+    draw_cfg.defaultbodyfont = NULL;
+    draw_cfg.defaulttitlefont = NULL;
+    draw_cfg.bodyfont = NULL;
+    draw_cfg.titlefont = NULL;
+    draw_cfg.bodymsg = NULL;
+    draw_cfg.titlemsg = NULL;
+    sync_configs(&cfg, &draw_cfg);
 
     size_t ret;
     size_t linelen = 100;
@@ -297,7 +342,7 @@ main(int argc, char **argv)
 
     pthread_t xev_thread;
 
-    pthread_create(&xev_thread, NULL, xev_handle, (void *)&cfg);
+    pthread_create(&xev_thread, NULL, xev_handle, (void *)&draw_cfg);
 
     enum {
         INIT,
@@ -342,13 +387,15 @@ main(int argc, char **argv)
         }
         ret = 0;
         while ((ret = getline(&line, &linelen, fifo)) != -1) {
-            pthread_mutex_lock(&lock);
             switch (state) {
             case INIT:
                 if (ISCMD("show")) {
+                    pthread_mutex_lock(&lock);
+                    sync_configs(&cfg, &draw_cfg);
                     xcb_map_window(cfg.c, cfg.win);
                     xcb_flush(cfg.c);
-                    draw(&cfg);
+                    draw(&draw_cfg);
+                    pthread_mutex_unlock(&lock);
                     timer_settime(cfg.timer, 0, &cfg.timer_int, NULL);
                 } else if (ISCMD("reset")) {
                     reset_config(&cfg);
@@ -472,7 +519,6 @@ main(int argc, char **argv)
             default:
                 break;
             }
-            pthread_mutex_unlock(&lock);
         }
         if (ret == -1) {
             if (errno == EINTR) {
