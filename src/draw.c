@@ -3,7 +3,7 @@
 
 #include "draw.h"
 
-static void
+void
 get_title_height(struct config *cfg, int *height)
 {
     if (!cfg->titlemsg) {
@@ -16,6 +16,7 @@ get_title_height(struct config *cfg, int *height)
     pango_layout_set_font_description(pl, desc);
     pango_font_description_free(desc);
     pango_layout_get_pixel_size(pl, NULL, height);
+    g_object_unref(pl);
 }
 
 void

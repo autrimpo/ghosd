@@ -16,8 +16,6 @@
 #define ISCMD(CMD)                                                             \
     (ret == strlen(CMD "\n") && !strncmp(line, CMD "\n", strlen(CMD "\n")))
 
-/* #define VERSION "0.1" */
-
 void setup_sighandler();
 void draw(struct config *cfg);
 int init(struct config *cfg);
@@ -26,7 +24,7 @@ int init_timer(timer_t *timer);
 void reset_config(struct config *cfg);
 void init_config(struct config *cfg);
 void destroy_config(struct config *cfg);
-void destroy(struct config *cfg);
+void destroy(struct config *cfg, struct config *draw_cfg);
 
 void print_help(char *bin);
 void print_version();

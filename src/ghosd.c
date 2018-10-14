@@ -61,22 +61,22 @@ sync_configs(struct config *main, struct config *draw)
     memcpy(draw, main, sizeof(struct config));
 
     if (main->bodymsg) {
-        draw->bodymsg = malloc(strlen(main->bodymsg));
+        draw->bodymsg = malloc(strlen(main->bodymsg) + 1);
         strcpy(draw->bodymsg, main->bodymsg);
     }
 
     if (main->bodyfont != main->defaultbodyfont) {
-        draw->bodyfont = malloc(strlen(main->bodyfont));
+        draw->bodyfont = malloc(strlen(main->bodyfont) + 1);
         strcpy(draw->bodyfont, main->bodyfont);
     }
 
     if (main->titlemsg) {
-        draw->titlemsg = malloc(strlen(main->titlemsg));
+        draw->titlemsg = malloc(strlen(main->titlemsg) + 1);
         strcpy(draw->titlemsg, main->titlemsg);
     }
 
     if (main->titlefont != main->defaulttitlefont) {
-        draw->titlefont = malloc(strlen(main->titlefont));
+        draw->titlefont = malloc(strlen(main->titlefont) + 1);
         strcpy(draw->titlefont, main->titlefont);
     }
 }
@@ -231,17 +231,24 @@ destroy_config(struct config *cfg)
     if (cfg->bodyfont != cfg->defaultbodyfont) {
         free(cfg->bodyfont);
     }
-    timer_delete(cfg->timer);
+
+    check_and_free(cfg->titlemsg);
+    if (cfg->titlefont != cfg->defaulttitlefont) {
+        free(cfg->titlefont);
+    }
 }
 
 void
-destroy(struct config *cfg)
+destroy(struct config *cfg, struct config *draw_cfg)
 {
+    g_object_unref(cfg->pl);
     cairo_surface_destroy(cfg->sfc);
     cairo_destroy(cfg->cr);
     xcb_ewmh_connection_wipe(&cfg->ewmh);
     xcb_disconnect(cfg->c);
+    timer_delete(cfg->timer);
     destroy_config(cfg);
+    destroy_config(draw_cfg);
     pthread_mutex_destroy(&lock);
 }
 
@@ -321,12 +328,12 @@ main(int argc, char **argv)
         return -1;
     }
 
-    draw_cfg.defaultbodyfont = NULL;
+    draw_cfg.defaultbodyfont  = NULL;
     draw_cfg.defaulttitlefont = NULL;
-    draw_cfg.bodyfont = NULL;
-    draw_cfg.titlefont = NULL;
-    draw_cfg.bodymsg = NULL;
-    draw_cfg.titlemsg = NULL;
+    draw_cfg.bodyfont         = NULL;
+    draw_cfg.titlefont        = NULL;
+    draw_cfg.bodymsg          = NULL;
+    draw_cfg.titlemsg         = NULL;
     sync_configs(&cfg, &draw_cfg);
 
     size_t ret;
@@ -336,7 +343,7 @@ main(int argc, char **argv)
     line = malloc(linelen);
     if (!line) {
         fprintf(stderr, "Failed to allocate a line buffer.\n");
-        destroy(&cfg);
+        destroy(&cfg, &draw_cfg);
         return -1;
     }
 
@@ -544,7 +551,7 @@ main(int argc, char **argv)
     pthread_join(xev_thread, NULL);
 
     check_and_free(line);
-    destroy(&cfg);
+    destroy(&cfg, &draw_cfg);
 
     return 0;
 }
