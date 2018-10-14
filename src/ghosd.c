@@ -139,7 +139,7 @@ init_timer(timer_t *timer)
 void
 reset_config(struct config *cfg)
 {
-    cfg->bodycolor  = (struct color)DEFAULT_BODY_COLOR;
+    cfg->bodycolor = (struct color)DEFAULT_BODY_COLOR;
     linetobodytype(DEFAULT_BODY_TYPE "\n", &cfg->bodytype);
     cfg->bar.val    = DEFAULT_BODY_BAR_VALUE / 100.0;
     cfg->bar.width  = DEFAULT_BODY_BAR_WIDTH / 100.0;
@@ -269,7 +269,7 @@ main(int argc, char **argv)
     setup_sighandler();
 
     char *fifo_path = getenv("GHOSD_FIFO");
-    FILE *fifo;
+    FILE *fifo      = NULL;
 
     if (!fifo_path) {
         fifo_path = DEFAULT_FIFO;
@@ -326,7 +326,9 @@ main(int argc, char **argv)
     run = 1;
 
     while (run) {
-        fifo = fopen(fifo_path, "r");
+        if (!fifo) {
+            fifo = fopen(fifo_path, "r");
+        }
         if (!fifo && errno == EINTR) {
             if (timed_out) {
                 xcb_unmap_window(cfg.c, cfg.win);
@@ -339,16 +341,7 @@ main(int argc, char **argv)
             break;
         }
         ret = 0;
-        while (ret != -1) {
-            ret = getline(&line, &linelen, fifo);
-            if (ret == -1 && errno == EINTR) {
-                ret   = 0;
-                errno = 0;
-                continue;
-            }
-            if (!run || ret == -1) {
-                break;
-            }
+        while ((ret = getline(&line, &linelen, fifo)) != -1) {
             pthread_mutex_lock(&lock);
             switch (state) {
             case INIT:
@@ -481,8 +474,16 @@ main(int argc, char **argv)
             }
             pthread_mutex_unlock(&lock);
         }
-        fclose(fifo);
-        fifo = NULL;
+        if (ret == -1) {
+            if (errno == EINTR) {
+                clearerr(fifo);
+            }
+            if (feof(fifo)) {
+                clearerr(fifo);
+                fclose(fifo);
+                fifo = NULL;
+            }
+        }
     }
 
     if (fifo) {
