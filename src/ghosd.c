@@ -148,6 +148,14 @@ init(struct config *cfg)
     xcb_ewmh_set_wm_window_type(&cfg->ewmh, cfg->win, 1,
                                 &cfg->ewmh._NET_WM_WINDOW_TYPE_NOTIFICATION);
 
+    char *name = "ghosd";
+    xcb_change_property(cfg->c, XCB_PROP_MODE_REPLACE, cfg->win,
+                        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(name),
+                        name);
+    xcb_change_property(cfg->c, XCB_PROP_MODE_REPLACE, cfg->win,
+                        XCB_ATOM_WM_CLASS, XCB_ATOM_STRING, 8, strlen(name),
+                        name);
+
     xcb_flush(cfg->c);
 
     cfg->sfc = cairo_xcb_surface_create(cfg->c, cfg->win, visual_type,
