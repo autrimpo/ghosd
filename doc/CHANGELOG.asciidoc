@@ -1,6 +1,10 @@
 = Changelog
 :toc:
 
+== v0.2.3 - 2019-02-13
+=== Added
+    * Set `WM_CLASS` and `WM_NAME` to `ghosd`.
+
 == v0.2.2 - 2018-10-14
 === Fixed
     * Possible race conditions when drawing.
